@@ -1,0 +1,14 @@
+# your data and settings - never commit these
+data/
+config.json
+github-token.txt
+# created by the app
+.update/
+__pycache__/
+*.pyc
+# the bundled Windows Python and release builds
+python/
+dist/
+python-embed.zip
+# working files
+Claude outputs/

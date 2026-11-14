@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Emergency Hub Coordinator</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="vendor/leaflet.css">
+<link rel="stylesheet" href="vendor/MarkerCluster.css">
+<link rel="stylesheet" href="style.css">
+<script>try { document.documentElement.dataset.theme = localStorage.getItem('ehc.theme') || 'light';
+  document.documentElement.dataset.map = localStorage.getItem('ehc.map') || document.documentElement.dataset.theme; } catch (e) { /* ignore */ }</script>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark" id="brandMark">&#9733;</span>
+    <img class="brand-logo" id="brandLogo" alt="" hidden>
+    <div class="brand-text">
+      <div class="brand-title" id="brandTitle">Emergency Hub Coordinator</div>
+      <div class="brand-sub" id="brandSub">Loading&hellip;</div>
+    </div>
+    <button type="button" class="demo-badge" id="demoBadge" hidden title="Everyone shown is made up. Click to turn the demo off in Settings.">DEMO<span class="db-long"> &middot; made-up people</span></button>
+  </div>
+  <nav class="actions">
+    <button class="btn primary" id="btnSync" hidden title="Fetch the latest contact list from ChurchSuite">&#8635; Sync from ChurchSuite</button>
+    <button class="btn primary" id="btnUpload">Upload contacts CSV</button>
+    <input type="file" id="fileInput" accept=".csv,text/csv" hidden>
+    <button class="btn" id="btnTable">Table view</button>
+    <button class="btn" id="btnReport">Changes report</button>
+    <button class="btn" id="btnUnmapped">Not on map <span class="badge" id="unmappedBadge">0</span></button>
+    <button class="btn" id="btnHubs">Hub groups</button>
+    <a class="btn" id="btnExport" href="/api/export.csv">Export CSV</a>
+    <button class="btn icon" id="btnLock" hidden title="Lock now - the passphrase is needed to open it again" aria-label="Lock">&#128274;</button>
+    <button class="btn icon" id="btnTheme" title="Switch to dark mode" aria-label="Switch between light and dark mode">&#9790;</button>
+    <button class="btn" id="btnSettings" title="Settings">&#9881;<span class="btn-label"> Settings</span></button>
+    <button class="btn icon help-btn" id="btnHelp" title="Help: quick start guide and questions" aria-label="Help">?</button>
+  </nav>
+</header>
+
+<div class="layout">
+  <aside class="sidebar">
+    <section class="panel print-panel" id="printPanel">
+      <h2>Paper call lists</h2>
+      <div class="printed-line">Call lists last printed: <b id="printedDate">Never</b></div>
+      <div class="printed-warn" id="printedWarn" hidden></div>
+      <div class="printed-actions">
+        <button class="btn small" id="btnSidePrint" title="Print every hub's call list">&#128438; Print call lists</button>
+        <button class="btn small" id="btnSideConfirm" title="Record today as the date the paper lists were printed and handed out">&#10003; Confirm call lists printed</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Legend &amp; filter</h2>
+      <p class="hint">Untick a category to hide it. Colour shows the highest-priority ticked status.</p>
+      <ul class="legend" id="legend"></ul>
+      <div class="legend-actions">
+        <button class="link" id="legendAll">Show all</button> &middot;
+        <button class="link" id="legendNone">Hide all</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Map layers</h2>
+      <label class="check"><input type="checkbox" id="toggleNetwork" checked> Hub network lines</label>
+      <label class="check"><input type="checkbox" id="toggleCluster" checked> Group nearby dots</label>
+      <div class="network-key">
+        <span><i class="line thick" id="keyCentreLine"></i> <span id="keyCentreName">Centre</span>&nbsp;&rarr; hub</span>
+        <span><i class="line thin" id="keySpokeLine"></i> Hub &rarr; person</span>
+        <span id="keySubhubRow" hidden><i class="line" id="keySubhubLine"></i> Hub &rarr; hub in its group</span>
+        <span><i class="line thin dashed" id="keyManualLine"></i> Hub chosen by hand</span>
+        <span><i class="hubring" id="keyHubRing"></i> Hub coordinator</span>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Find a person</h2>
+      <input type="search" id="search" placeholder="Name, street, town or postcode" autocomplete="off">
+      <ul class="results" id="results"></ul>
+    </section>
+
+    <section class="panel stats" id="stats"></section>
+  </aside>
+
+  <main class="mapwrap">
+    <div id="map"></div>
+    <div class="placing-banner" id="placingBanner" hidden>
+      Click on the map to set the position of <b id="placingName"></b>. <button class="btn small" id="placingCancel">Cancel</button>
+    </div>
+    <div class="empty-state" id="emptyState" hidden>
+      <h3>No contacts yet</h3>
+      <p>Upload a CSV export of your church database to get started.<br>
+      Expected columns: First Name, Last Name, Address 1, Address 2, Town/City, County, Postcode, Country, Telephone, Mobile, Email.</p>
+      <button class="btn primary" id="btnUpload2">Upload contacts CSV</button>
+      <p class="muted" style="margin-top:12px">Using ChurchSuite? Connect it in <b>Settings &rarr; Data &amp; privacy</b> instead.</p>
+      <p class="muted">First time here? <button class="link" id="btnEmptyHelp" type="button">Open the quick start guide</button></p>
+    </div>
+  </main>
+
+  <aside class="drawer" id="drawer" aria-hidden="true">
+    <button class="drawer-close" id="drawerClose" title="Close">&times;</button>
+    <div id="card"></div>
+  </aside>
+</div>
+
+<div class="modal-back" id="modalBack" hidden>
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal-head">
+      <h2 id="modalTitle"></h2>
+      <div class="modal-tools" id="modalTools"></div>
+      <button class="drawer-close" id="modalClose" title="Close">&times;</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<div class="busy" id="busy" hidden><div class="spinner"></div><div id="busyText">Working&hellip;</div></div>
+<div class="toast" id="toast" hidden></div>
+<div id="printArea" aria-hidden="true"></div>
+
+<script src="vendor/leaflet.js"></script>
+<script src="vendor/leaflet.markercluster.js"></script>
+<div class="lockscreen" id="lockScreen" hidden>
+  <form class="lock-card" id="lockForm" autocomplete="off">
+    <img id="lockLogo" alt="" hidden>
+    <div class="lock-org" id="lockOrg"></div>
+    <h1>Emergency Hub Coordinator</h1>
+    <p class="muted">The contact data is encrypted. Enter the passphrase to unlock it.</p>
+    <input type="password" id="lockPass" placeholder="Passphrase" autocomplete="current-password" aria-label="Passphrase">
+    <button class="btn primary" id="lockBtn" type="submit">Unlock</button>
+    <div class="lock-err" id="lockErr" hidden></div>
+    <button class="btn" id="lockDemo" type="button">Show the demo instead</button>
+    <p class="muted lock-note">Forgotten the passphrase? The data cannot be recovered without it - ask your data protection lead.</p>
+  </form>
+</div>
+<script src="vendor/jspdf.umd.min.js"></script>
+<script src="dppack.js"></script>
+<script src="app.js"></script>
+<script src="help.js"></script>
+</body>
+</html>

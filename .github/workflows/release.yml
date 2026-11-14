@@ -1,0 +1,56 @@
+# Publishes a release when a version tag (for example v1.2.0) is pushed.
+# Steps for a new version: update VERSION and CHANGELOG.md, commit, then tag:  git tag v1.2.0 && git push --tags
+name: Release
+
+on:
+  push:
+    tags: ["v*.*.*"]
+
+permissions:
+  contents: write
+
+env:
+  # Windows "embeddable" Python bundled in the full download. Change both lines together.
+  PY_EMBED_VERSION: "3.14.10"
+  PY_EMBED_SHA256: "90905e64a840557d8c1bc4f5b74db3d7ee85e3ffb217611cac1c7813acea4159"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check the tag matches VERSION
+        run: |
+          test "v$(cat VERSION)" = "$GITHUB_REF_NAME" || { echo "Tag $GITHUB_REF_NAME does not match VERSION $(cat VERSION)"; exit 1; }
+          grep -q "^## \[$(cat VERSION)\]" CHANGELOG.md || { echo "CHANGELOG.md has no section for $(cat VERSION)"; exit 1; }
+
+      - name: Check the code
+        run: |
+          python3 -m py_compile server.py tools/build_release.py tools/make_demo.py
+          for f in static/*.js; do node --check "$f"; done
+
+      - name: Start the app and ask it its version
+        run: |
+          mkdir -p "$RUNNER_TEMP/ehc-data"
+          EHC_NO_BROWSER=1 EHC_DATA_DIR="$RUNNER_TEMP/ehc-data" EHC_CONFIG="$RUNNER_TEMP/ehc-data/config.json" EHC_PORT=8799 python3 server.py &
+          for i in $(seq 1 20); do sleep 1; curl -sf http://127.0.0.1:8799/api/version && break; done
+          curl -sf http://127.0.0.1:8799/api/version | grep -q "\"$(cat VERSION)\""
+          curl -sf http://127.0.0.1:8799/api/state > /dev/null
+          kill %1
+
+      - name: Download the Windows Python
+        run: |
+          curl -fsSL -o python-embed.zip "https://www.python.org/ftp/python/${PY_EMBED_VERSION}/python-${PY_EMBED_VERSION}-embed-amd64.zip"
+          echo "${PY_EMBED_SHA256}  python-embed.zip" | sha256sum -c -
+
+      - name: Build
+        run: |
+          python3 tools/build_release.py --python-zip python-embed.zip --out dist
+          python3 tools/build_release.py --notes "$(cat VERSION)" > notes.md
+          ls -l dist
+
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" dist/* --title "Version $(cat VERSION)" --notes-file notes.md
