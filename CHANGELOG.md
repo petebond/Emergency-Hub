@@ -2,6 +2,11 @@
 
 Each version's notes appear in the app under **Settings → About & updates** when it's available.
 
+## [1.2.1] - 2026-11-14
+
+- **Find a person** is now at the top of the left-hand panel.
+- The map's layers button (for switching to satellite) has a clearer icon and is easy to see in dark mode, as are the zoom buttons.
+
 ## [1.2.0] - 2026-11-14
 
 - A tidier title bar: all the buttons now live in one **Menu** in the top right corner, grouped into Contacts (sync, upload, export), Planning (hub groups, table view, not on map, changes report), and Settings, dark mode, lock and help.

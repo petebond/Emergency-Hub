@@ -51,6 +51,11 @@
 
 <div class="layout">
   <aside class="sidebar">
+    <section class="panel">
+      <h2>Find a person</h2>
+      <input type="search" id="search" placeholder="Name, street, town or postcode" autocomplete="off">
+      <ul class="results" id="results"></ul>
+    </section>
     <section class="panel print-panel" id="printPanel">
       <h2>Paper call lists</h2>
       <div class="printed-line">Call lists last printed: <b id="printedDate">Never</b></div>
@@ -84,11 +89,6 @@
       </div>
     </section>
 
-    <section class="panel">
-      <h2>Find a person</h2>
-      <input type="search" id="search" placeholder="Name, street, town or postcode" autocomplete="off">
-      <ul class="results" id="results"></ul>
-    </section>
 
     <section class="panel stats" id="stats"></section>
   </aside>
