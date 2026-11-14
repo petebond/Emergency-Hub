@@ -239,8 +239,10 @@ function applyTheme(theme) {
   applyMapTheme((SETTINGS && SETTINGS.map_theme) || 'auto', theme);
   const dark = theme === 'dark';
   applyAccent((SETTINGS && SETTINGS.accent_color) || '#23395D', theme);
-  $('btnTheme').innerHTML = dark ? '&#9728;' : '&#9790;';
-  $('btnTheme').title = dark ? 'Switch to light mode' : 'Switch to dark mode';
+  $('btnTheme').querySelector('.mi-text').textContent = dark ? 'Light mode' : 'Dark mode';
+  $('btnTheme').querySelector('.mi-ic').innerHTML = dark
+    ? '<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/>'
+    : '<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>';
 }
 
 function applyMapTheme(mapTheme, theme) {
@@ -459,10 +461,10 @@ function applyState(s) {
     $(id).disabled = demo;
     $(id).title = demo ? 'Not available in the demo - turn the demo off in Settings to upload your real list' : '';
   });
+  $('uploadNote').hidden = !demo;
   const csOn = !!(s.churchsuite && s.churchsuite.configured);
   $('btnSync').hidden = !csOn;
-  $('btnUpload').classList.toggle('primary', !csOn);
-  $('btnUpload').textContent = csOn ? 'Upload CSV' : 'Upload contacts CSV';
+  $('btnUploadLabel').textContent = csOn ? 'Upload a CSV file' : 'Upload contacts CSV';
   if (s.settings) {
     SETTINGS = s.settings;
     COLORS = Object.assign({}, s.settings.status_colors);
@@ -1475,13 +1477,13 @@ function showSettings(draft) {
     </section>
     ${demoOff('CSV upload')}
       <h3>CSV upload${demoChip}</h3>
-      <p class="muted">Without a connection, use <b>Upload contacts CSV</b> in the title bar. The file must be a complete export with the columns
+      <p class="muted">Without a connection, use <b>Upload contacts CSV</b> in the menu. The file must be a complete export with the columns
         First Name, Last Name, Address 1, Address 2, Town/City, County, Postcode, Country, Telephone, Mobile, Email.</p>
     </section>
     ${demoOff('Encryption')}
       <h3>Encryption${demoChip} ${(STATE.security || {}).encrypted ? '<span class="chip" style="background:var(--ok)">On</span>' : '<span class="chip grey">Off</span>'}</h3>
       ${(STATE.security || {}).encrypted ? `
-      <p class="muted">The data folder is encrypted. The app asks for the passphrase when it starts, after the lock button (&#128274;) is pressed,
+      <p class="muted">The data folder is encrypted. The app asks for the passphrase when it starts, after <b>Lock now</b> in the menu is clicked,
         and after it has not been used for the auto-lock time.</p>
       <div class="form-grid">
         <label>Lock automatically after<select id="setAutoLock">${[[0, 'Never'], [10, '10 minutes'], [30, '30 minutes'], [60, '1 hour'], [120, '2 hours'], [240, '4 hours']]
@@ -1548,7 +1550,7 @@ function showSettings(draft) {
           <label><input type="radio" name="mapTheme" value="dark" ${st.map_theme === 'dark' ? 'checked' : ''}> &#9790; Always dark</label>
         </div>
       </div>
-      <p class="muted" style="margin-top:6px;font-size:12px">The moon/sun button in the title bar switches the interface; the map follows it only when set to &ldquo;Same as the interface&rdquo;. Printouts are always light.</p>
+      <p class="muted" style="margin-top:6px;font-size:12px"><b>Dark mode</b> / <b>Light mode</b> in the menu switches the interface; the map follows it only when set to &ldquo;Same as the interface&rdquo;. Printouts are always light.</p>
       <div class="lg-head" style="margin-top:12px">Map for use without internet</div>
       <p class="muted" style="font-size:12px;margin:2px 0 6px">Every part of the <b>street map</b> you view is kept on this PC and used first, so areas you have already looked at
         (at the zoom levels you looked at them) still show if the internet goes down. To prepare, browse your area and zoom in on the streets you may need.
@@ -2007,7 +2009,8 @@ function checkPageVersion(serverVersion) {
 function showUpdateNotice(u) {
   const on = !!(u && u.available && u.latest);
   $('btnSettings').classList.toggle('has-update', on);
-  $('btnSettings').title = on ? `Settings - version ${u.latest.version} is available` : 'Settings';
+  $('btnMenu').classList.toggle('has-update', on);
+  $('btnMenu').title = on ? `Menu - version ${u.latest.version} is available in Settings` : 'Menu';
   if (!on) return;
   let shown = null;
   try { shown = sessionStorage.getItem('ehc.updateToast'); sessionStorage.setItem('ehc.updateToast', u.latest.version); } catch (e) { /* ignore */ }
@@ -2132,6 +2135,30 @@ function setAllFilters(v) {
   savePref('ehc.filters', filters);
   renderAll(false);
 }
+
+// ------------------------------------------------------------------ the menu (top right)
+function menuItems() { return [...$('mainMenu').querySelectorAll('.mi')].filter((x) => !x.hidden && !x.disabled); }
+function openMenu() {
+  $('mainMenu').hidden = false;
+  $('btnMenu').setAttribute('aria-expanded', 'true');
+  const first = menuItems()[0];
+  if (first) first.focus({ preventScroll: true });
+}
+function closeMenu(focusButton) {
+  if ($('mainMenu').hidden) return;
+  $('mainMenu').hidden = true;
+  $('btnMenu').setAttribute('aria-expanded', 'false');
+  if (focusButton) $('btnMenu').focus();
+}
+$('btnMenu').addEventListener('click', (e) => { e.stopPropagation(); if ($('mainMenu').hidden) openMenu(); else closeMenu(); });
+$('mainMenu').addEventListener('click', (e) => { if (e.target.closest('.mi')) closeMenu(); });
+document.addEventListener('click', (e) => { if (!e.target.closest('.menu-wrap')) closeMenu(); });
+$('mainMenu').addEventListener('keydown', (e) => {
+  const items = menuItems();
+  const i = items.indexOf(document.activeElement);
+  if (e.key === 'Escape') { e.preventDefault(); closeMenu(true); } else if (e.key === 'ArrowDown') { e.preventDefault(); items[(i + 1) % items.length].focus(); } else if (e.key === 'ArrowUp') { e.preventDefault(); items[(i - 1 + items.length) % items.length].focus(); } else if (e.key === 'Home') { e.preventDefault(); items[0].focus(); } else if (e.key === 'End') { e.preventDefault(); items[items.length - 1].focus(); } else if (e.key === 'Tab') closeMenu();
+});
+$('btnMenu').addEventListener('keydown', (e) => { if (e.key === 'ArrowDown') { e.preventDefault(); openMenu(); } });
 
 $('btnUpload').addEventListener('click', () => $('fileInput').click());
 $('btnSync').addEventListener('click', () => syncChurchSuite());

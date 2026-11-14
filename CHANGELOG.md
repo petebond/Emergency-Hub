@@ -2,6 +2,12 @@
 
 Each version's notes appear in the app under **Settings → About & updates** when it's available.
 
+## [1.2.0] - 2026-11-14
+
+- A tidier title bar: all the buttons now live in one **Menu** in the top right corner, grouped into Contacts (sync, upload, export), Planning (hub groups, table view, not on map, changes report), and Settings, dark mode, lock and help.
+- The menu works with the keyboard too: the arrow keys move through it and Esc closes it.
+- When a new version is available, the orange dot now appears on the Menu button.
+
 ## [1.1.1] - 2026-11-14
 
 - If Emergency Hub is already open in another window, starting it again now says so (and opens it in your browser) instead of showing a "page can't be found" error. If an older copy is still running, it tells you to close that window first.

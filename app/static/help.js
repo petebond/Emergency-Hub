@@ -20,6 +20,9 @@
         <p>The first time the app opens, it shows a made-up church called Riverside Community Church. Nobody in it is real, so you can click around,
         tick boxes and move people between hubs without worrying about anything. The orange <b>DEMO</b> badge in the title bar tells you when you're looking at it.</p>
         {{fig:overview}}
+        <p>Everything else lives in the <b>Menu</b> button in the top right corner: bringing in contacts, the hub groups, the table view, reports,
+        settings and this help.</p>
+        {{fig:menu}}
         <p>Click a dot to see who lives there and open their card. Where dots are close together they're gathered into a numbered circle,
         and clicking that splits it into the separate households. The lines show the plan: a thick line from the church to each hub coordinator, then thinner lines from each
         hub coordinator to the people they'll phone.</p>`,
@@ -53,16 +56,16 @@
         <p>There are two ways to do this.</p>
         <ul>
           <li><b>Upload a CSV file.</b> Export your address list from your church database or spreadsheet as a CSV file, then click
-          <b>Upload contacts CSV</b> in the title bar or drag the file onto the page. First and last names are essential, and addresses,
+          <b>Upload contacts CSV</b> in the menu, or drag the file onto the page. First and last names are essential, and addresses,
           postcodes and phone numbers make it useful. There's an example, <i>contacts-template.csv</i>, in the <i>app</i> folder,
           and the FAQ explains <a data-faq="csv">which columns it understands</a>.</li>
           <li><b>Connect ChurchSuite.</b> If your church uses ChurchSuite, the app can fetch the list for you. You set it up once in
           <a data-act="settings:data">Settings &rarr; Data &amp; privacy</a>, choose which tags to include, and from then on click
-          <b>Sync from ChurchSuite</b> whenever you want the latest list. The FAQ has <a data-faq="churchsuite">step-by-step instructions for connecting it</a>.</li>
+          <b>Sync from ChurchSuite</b> in the menu whenever you want the latest list. The FAQ has <a data-faq="churchsuite">step-by-step instructions for connecting it</a>.</li>
         </ul>
         <p>Either way, the app looks up each postcode to put people on the map, then shows you a report of who was added, removed or changed.</p>
         {{fig:changes-report}}
-        <p>Afterwards, click <a data-act="unmapped">Not on map</a> in the title bar. It lists anyone the app couldn't place, usually because of a missing or
+        <p>Afterwards, choose <a data-act="unmapped">Not on map</a> from the menu. It lists anyone the app couldn't place, usually because of a missing or
         mistyped postcode. Fix the address in your church database so it's right next time, or open the person's card and use <b>Place on map by hand</b>.</p>`,
     },
     {
@@ -127,12 +130,12 @@
     overview: {
       src: 'help/overview.jpg', alt: 'The main screen showing the demo church on a map',
       caption: `<ol class="help-callouts">
-        <li>The title bar, for bringing in contacts, the table view, reports, hub groups and settings.</li>
+        <li>The menu, for bringing in contacts, hub groups, the table view, reports, settings and help.</li>
         <li>The Paper call lists box, with the date the lists were last printed.</li>
         <li>The legend. Untick a status to hide those people from the map.</li>
-        <li>Each dot is a household, coloured by the most important status of anyone living there.</li>
-        <li>Help, which is where you are now.</li></ol>`,
+        <li>Each dot is a household, coloured by the most important status of anyone living there.</li></ol>`,
     },
+    menu: { w: 300, src: 'help/menu.jpg', alt: 'The menu open, listing everything the app can do', caption: 'The menu, opened from the top right corner.' },
     'demo-switch': { src: 'help/demo-switch.jpg', alt: 'The Demo mode section of the settings', caption: 'The demo switch is at the top of the Data &amp; privacy tab.' },
     'settings-org': { src: 'help/settings-org.jpg', alt: 'The Organisation details tab of the settings', caption: 'Your church\'s name, logo and central hub.' },
     'changes-report': { src: 'help/changes-report.jpg', alt: 'A changes report after loading a contact list', caption: 'After every upload or sync you get a report like this. Older ones are kept under Changes report.' },
@@ -166,7 +169,7 @@
           id: 'backup', q: 'How should we back it up?',
           a: `<p>Copy the whole <b>data</b> folder somewhere safe, ideally an encrypted USB stick or another computer you trust. To restore it, close the black
             server window, copy the folder back and start the app again.</p>
-            <p><b>Export CSV</b> in the title bar also gives you a spreadsheet of everyone with their statuses, hub and notes. That's handy for checking things,
+            <p><b>Export CSV</b> in the menu also gives you a spreadsheet of everyone with their statuses, hub and notes. That's handy for checking things,
             but the file isn't encrypted, so delete it when you've finished with it.</p>`,
         },
         {
@@ -174,7 +177,7 @@
           a: `<p>If you're recording anything sensitive, such as who is vulnerable, then yes. Encryption scrambles the files in the data folder (including the
             backups and your ChurchSuite details), so they're useless to anyone who gets hold of the computer or its drive.</p>
             <p>Once it's on, the app asks for the passphrase each time it starts, and locks itself if nobody uses it for a while (30 minutes unless you change it).
-            You can also lock it straight away with the padlock button. Turn it on in <a data-act="settings:data">Settings &rarr; Data &amp; privacy</a>.</p>`,
+            You can also lock it straight away with <b>Lock now</b> in the menu. Turn it on in <a data-act="settings:data">Settings &rarr; Data &amp; privacy</a>.</p>`,
         },
         {
           id: 'forgot', q: 'What happens if we forget the passphrase?',
@@ -246,7 +249,7 @@
             <b>Client ID</b> and <b>Client Secret</b> for that user. Paste both into <a data-act="settings:data">Settings &rarr; Data &amp; privacy</a> and click
             <b>Connect to ChurchSuite</b>.</p>
             <p>The app then shows your ChurchSuite tags. Tick the ones that should be included (anyone with any ticked tag is fetched), and use
-            <b>Sync from ChurchSuite</b> in the title bar whenever you want the latest list. The link only reads from ChurchSuite and never changes anything there.
+            <b>Sync from ChurchSuite</b> in the menu whenever you want the latest list. The link only reads from ChurchSuite and never changes anything there.
             The secret is stored on this computer only.</p>`,
         },
         {
@@ -284,7 +287,7 @@
         },
         {
           id: 'not-on-map', q: 'Why isn\'t someone on the map?',
-          a: `<p>Usually their postcode is missing, mistyped or out of date. <a data-act="unmapped">Not on map</a> in the title bar lists everyone who couldn't be
+          a: `<p>Usually their postcode is missing, mistyped or out of date. <a data-act="unmapped">Not on map</a> in the menu lists everyone who couldn't be
             placed, along with anyone whose position is only approximate. The best fix is to correct the address in your church database, so it's right on the
             next upload. For a quick fix, open their card and use <b>Place on map by hand</b>, then click where they live.</p>`,
         },
@@ -308,8 +311,8 @@
         },
         {
           id: 'map-style', q: 'Can I see a satellite view, or a dark map?',
-          a: `<p>Use the layers button in the top right corner of the map to switch between the street map and satellite. The moon and sun button in the title bar
-            switches between light and dark. In <a data-act="settings:look">Settings &rarr; Look and feel</a> you can keep the map light while the rest goes dark,
+          a: `<p>Use the layers button in the top right corner of the map to switch between the street map and satellite. <b>Dark mode</b> (or <b>Light mode</b>) in the menu
+            switches between the two. In <a data-act="settings:look">Settings &rarr; Look and feel</a> you can keep the map light while the rest goes dark,
             or the other way round.</p>`,
         },
       ],
@@ -394,7 +397,7 @@
       items: [
         {
           id: 'updates', q: 'How do I get new versions?',
-          a: `<p>The app checks once a day whether a new version has been published, and when there is one, an orange dot appears on the Settings button.
+          a: `<p>The app checks once a day whether a new version has been published, and when there is one, an orange dot appears on the Menu button and next to Settings.
             Go to <a data-act="settings:about">Settings &rarr; About &amp; updates</a> to read what's new and click <b>Install</b>. It downloads the new version,
             restarts itself and reloads the page, which takes less than a minute. You can also click <b>Check now</b> at any time, or turn the daily check off.</p>`,
         },
@@ -551,7 +554,7 @@
     openModal('Help', render(),
       '<button class="btn small" id="btnPrintQs" title="Print the quick start guide, with pictures">&#128438; Print the quick start guide</button>', 'helpmodal');
     try { localStorage.setItem('ehc.helpSeen', '1'); } catch (e) { /* ignore */ }
-    $('btnHelp').classList.remove('pulse');
+    $('btnMenu').classList.remove('pulse');
     const body = $('modalBody');
     body.querySelectorAll('[data-help-tab]').forEach((b) => b.addEventListener('click', () => setTab(b.dataset.helpTab)));
     body.addEventListener('click', (e) => {
@@ -608,7 +611,7 @@
       <div class="qs-intro">${stripLinks(QUICK_START_INTRO)}</div>
       <ol class="qs-toc">${QUICK_START.map((s) => `<li>${s.title}</li>`).join('')}</ol>
       ${QUICK_START.map((s, i) => `<section class="qs-step"><h2><span class="qs-num">${i + 1}</span>${s.title}</h2>${stripLinks(fill(s.html, true))}</section>`).join('')}
-      <div class="qs-outro">${stripLinks(QUICK_START_OUTRO).replace('The FAQ', 'The FAQ in the app (the ? button)')}</div>
+      <div class="qs-outro">${stripLinks(QUICK_START_OUTRO).replace('The FAQ', 'The FAQ in the app (Menu, then Help and quick start)')}</div>
     </div>`;
     const theme = document.documentElement.dataset.theme;
     document.documentElement.dataset.theme = 'light';
@@ -630,6 +633,6 @@
   btn.addEventListener('click', () => openHelp());
   const eh = $('btnEmptyHelp');
   if (eh) eh.addEventListener('click', () => openHelp('quick'));
-  try { if (!localStorage.getItem('ehc.helpSeen')) btn.classList.add('pulse'); } catch (e) { /* ignore */ }
+  try { if (!localStorage.getItem('ehc.helpSeen')) $('btnMenu').classList.add('pulse'); } catch (e) { /* ignore */ }
   window.EHCHelp = { open: openHelp, openFaq: (id) => { openHelp('faq'); openFaq(id); }, printQuickStart };
 }());

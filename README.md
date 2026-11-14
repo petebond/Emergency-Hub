@@ -29,7 +29,7 @@ Emergency Hub Coordinator\
 ```
 
 `data` appears the first time you start it. Nothing else needs installing. It opens in demo mode the
-first time, and the **?** button in the top right has a quick start guide.
+first time. Everything is in the **Menu** button in the top right, including **Help and quick start**.
 
 If Windows shows "Windows protected your PC", click **More info** then **Run anyway**. It does that for
 programs from the internet that aren't signed by a software company.
@@ -37,7 +37,7 @@ programs from the internet that aren't signed by a software company.
 ## Updating
 
 The app checks once a day for a new version (you can turn this off). When there is one, an orange dot
-appears on the Settings button. **Settings → About & updates** shows what's new and installs it with one
+appears on the Menu button. **Settings → About & updates** shows what's new and installs it with one
 click: the app downloads the update, checks it against the SHA-256 fingerprint published with the
 release, keeps the current version so you can go back, puts the new files in place and restarts.
 
@@ -90,9 +90,9 @@ A new installation opens in **demo mode**: a made-up church ("Riverside Communit
 | People not on the map | **Not on map** lists anyone whose address is missing, incomplete or not recognised, plus anyone whose position is only approximate. You can also **Place on map by hand**. |
 | Call lists | **Hub groups** lists each hub's people with their phone numbers. You can print it. |
 | Grouping levels | For larger organisations, set **Grouping levels** in Settings to 2 or more. A level 2 hub coordinator belongs to the group of the nearest level 1 hub coordinator, and so on down. Everyone else joins their nearest hub coordinator of any level. Set each hub coordinator's level on their card or in Table view. Each group and call list shows only the people directly in it. |
-| Settings | **Settings** (top right) sets your organisation's name and logo for the title bar (each can be hidden), light or dark mode, the central hub's name, location (by postcode, or by clicking a spot on the map) and marker (colour, size, and a star, your logo or another image), the status colours, dot size, line widths and line colours. The moon/sun button switches dark mode. Settings are saved in the `data` folder, so they move with it. |
+| Settings | **Settings** (in the menu, top right) sets your organisation's name and logo for the title bar (each can be hidden), light or dark mode, the central hub's name, location (by postcode, or by clicking a spot on the map) and marker (colour, size, and a star, your logo or another image), the status colours, dot size, line widths and line colours. **Dark mode** / **Light mode** in the menu switches between them. Settings are saved in the `data` folder, so they move with it. |
 | Statuses | **Settings → Statuses** lets you rename, recolour, reorder (priority), add and remove statuses. Hub Coordinator can be renamed but not removed. |
-| Encryption | **Settings → Data & privacy → Encryption** encrypts the contact data, backups and ChurchSuite details with a passphrase (at least 12 characters). The app then asks for it when it starts, when the 🔒 button is pressed and after the auto-lock time. **If the passphrase is lost the data cannot be recovered.** |
+| Encryption | **Settings → Data & privacy → Encryption** encrypts the contact data, backups and ChurchSuite details with a passphrase (at least 12 characters). The app then asks for it when it starts, when **Lock now** in the menu is clicked and after the auto-lock time. **If the passphrase is lost the data cannot be recovered.** |
 | Data Protection Pack | **Settings → Data & privacy → Create Data Protection Pack** downloads a PDF in your branding explaining your responsibilities under UK data protection law, with a privacy notice paragraph, a risk assessment outline, a hub coordinator confidentiality agreement and checklists. General guidance, not legal advice. |
 | Map without internet | Every part of the street map you view is stored on this PC (in `data/tiles`, up to 500 MB) and used first, so areas you have looked at still show if the internet is down. Browse and zoom in on your area beforehand. The satellite view always needs the internet. Clear the stored map in Settings → Look and feel. (OpenStreetMap's rules don't allow downloading whole areas in advance.) |
 | Backup / spreadsheet | **Export CSV** downloads everyone with their statuses, hub and notes. |
