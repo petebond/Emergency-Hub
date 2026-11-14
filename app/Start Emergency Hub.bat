@@ -1,9 +1,10 @@
 @echo off
 title Emergency Hub Coordinator
 rem Runs from the app folder. The "Emergency Hub" shortcut next to that folder starts this file.
-cd /d "%~dp0"
+rem Work out the folders before changing directory: %~dp0 can go wrong after a cd when started by a relative path.
 set "APPDIR=%~dp0"
 for %%I in ("%~dp0..") do set "ROOT=%%~fI"
+cd /d "%APPDIR%"
 
 rem Keep the "Emergency Hub" shortcut pointing here, with its icon. Only does anything the first time,
 rem or after the folder has been moved, so copies of the shortcut (for example on the desktop) keep working.

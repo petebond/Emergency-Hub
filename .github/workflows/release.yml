@@ -82,6 +82,7 @@ jobs:
           if (-not (Test-Path (Join-Path $root 'data\config.json'))) { throw 'data\config.json was not created next to the app folder' }
           $lnk = (New-Object -ComObject WScript.Shell).CreateShortcut((Join-Path $root 'Emergency Hub.lnk'))
           "Shortcut now: $($lnk.TargetPath) | icon $($lnk.IconLocation)"
+          Get-ChildItem -Force (Join-Path $root 'app') | Format-Table Name
           if ($lnk.TargetPath -notlike '*app\Start Emergency Hub.bat') { throw 'The launcher did not update the shortcut' }
           Get-Process python -ErrorAction SilentlyContinue | Stop-Process -Force
           Get-ChildItem $root | Format-Table Name
