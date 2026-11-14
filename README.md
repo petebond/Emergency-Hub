@@ -8,6 +8,30 @@ with printed call lists for each hub.
 Everything stays on your computer. There's no central server and no account to sign up for.
 Free and open source under the MIT licence.
 
+![The map, showing a church's households coloured by status, with lines from the church to each hub coordinator and from each hub coordinator to the people they'll phone](docs/images/map.jpg)
+
+*All the screenshots here use the built-in demo church. Every name, address and phone number in it is made up.*
+
+## What it does
+
+- **Maps your church family.** Everyone at the same address shares one dot, coloured by their most
+  important status (vulnerable, lives alone, leader, first aider, or your own statuses).
+- **Plans who rings whom.** Pick hub coordinators and everyone else is linked to the one who lives
+  nearest, with the option to choose by hand. Larger churches can have hubs within hubs.
+- **Prints the call lists.** Each hub coordinator gets their own pages, with a map of their group,
+  phone numbers, notes and tick boxes. The app reminds you when the paper copies are out of date.
+- **Keeps itself current.** Upload a CSV from any church database, or sync straight from
+  [ChurchSuite](#using-it-with-churchsuite).
+- **Looks after the data.** Optional encryption with a passphrase, a Data Protection Pack explaining
+  your responsibilities under UK law, and nothing sent anywhere except what's needed to put
+  postcodes on the map.
+
+<p>
+  <img src="docs/images/card.jpg" alt="A person's card, with their contact details, statuses and hub coordinator" width="49%">
+  <img src="docs/images/call-list.jpg" alt="A printed call list for one hub, with a map and a table of people to ring" width="24%">
+  <img src="docs/images/hub-groups.jpg" alt="The hub groups window, listing each hub coordinator's group" width="24%">
+</p>
+
 ## Installing it (Windows)
 
 1. Go to the [Releases page](https://github.com/petebond/Emergency-Hub/releases/latest) and download
@@ -48,6 +72,39 @@ and nothing else.
 
 To update by hand instead, download the new Windows zip, unzip it, and copy your `data` folder into the new
 folder.
+
+## Using it with ChurchSuite
+
+If your church uses [ChurchSuite](https://churchsuite.com), the app can fetch your contact list
+directly instead of you exporting and uploading a CSV file. It uses the ChurchSuite API v2.
+
+**What it does and doesn't do**
+
+- **Read-only.** It asks ChurchSuite for the `addressbook.read` permission only, and never creates,
+  changes or deletes anything in ChurchSuite.
+- **Only the people you choose.** You tick which ChurchSuite tags to include (for example Attender
+  and Partner), and it fetches active contacts with any of those tags. Nobody else is downloaded.
+- **Only the details it needs:** names, address, phone numbers and email. ChurchSuite's own map
+  position is used when a contact has one, so fewer postcodes need looking up.
+- **Your keys stay with you.** The Client ID and Secret are stored only on the church's own computer
+  (in `data/churchsuite.json`, encrypted if encryption is turned on), and are only ever sent to
+  ChurchSuite's own sign-in server.
+- **No middleman.** The app talks directly to `login.churchsuite.com` and `api.churchsuite.com`. There's
+  no Emergency Hub server in between, and the developers never see your data.
+- **Safe syncing.** People are matched by their ChurchSuite record, so statuses, notes and hub choices
+  carry over each time. If a sync would remove a large share of your list (more than 30%, and more
+  than five people), usually because a tag has been changed, the app stops and asks first. A backup
+  is taken before every sync, and it waits politely if ChurchSuite asks it to slow down.
+
+**Setting it up**
+
+1. In ChurchSuite, an Administrator creates a dedicated user with **view-only Address Book**
+   permission, turns on API access for it, and generates a **Client ID** and **Client Secret**.
+2. In the app, open **Menu → Settings → Data & privacy**, paste both in and click **Connect to
+   ChurchSuite**.
+3. Tick the tags to include. The app shows how many people that covers.
+4. Choose **Menu → Sync from ChurchSuite** whenever you want the latest list. You'll see a report of
+   who was added, removed or changed.
 
 ## Running from the source code
 
