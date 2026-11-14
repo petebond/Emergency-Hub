@@ -2401,6 +2401,32 @@ class Handler(BaseHTTPRequestHandler):
             self.send_json({"error": "Server error: %s" % e}, 500)
 
 
+def explain_port_in_use(url, port):
+    """Something is already using our port: usually another copy of the app left running in another window."""
+    other = None
+    try:
+        with urllib.request.urlopen(url + "api/version", timeout=3) as r:
+            other = json.loads(r.read().decode("utf-8")).get("version")
+    except Exception:
+        pass
+    print("=" * 60)
+    if other == APP_VERSION:
+        print(" Emergency Hub Coordinator is already running in another window.")
+        print(" Opening it in your browser - you can close this window.")
+        if CFG.get("open_browser"):
+            webbrowser.open(url)
+    elif other:
+        print(" An older copy of Emergency Hub Coordinator (version %s) is still" % other)
+        print(" running in another black window. Close that window, then start")
+        print(" Emergency Hub again.")
+    else:
+        print(" Another program is already using port %d, so the app can't start." % port)
+        print(" If an older Emergency Hub window is open, close it and try again.")
+        print(" Otherwise, change \"port\" in data\\config.json to another number,")
+        print(" for example 8766.")
+    print("=" * 60)
+
+
 def main():
     if MODE["demo"] or not is_locked():
         try:
@@ -2411,9 +2437,13 @@ def main():
         ensure_centre()
     threading.Thread(target=_auto_lock_loop, daemon=True).start()
     host, port = CFG["host"], int(CFG["port"])
-    srv = ThreadingHTTPServer((host, port), Handler)
-    threading.Thread(target=_auto_update_loop, daemon=True).start()
     url = "http://%s:%d/" % ("127.0.0.1" if host in ("0.0.0.0", "") else host, port)
+    try:
+        srv = ThreadingHTTPServer((host, port), Handler)
+    except OSError:
+        explain_port_in_use(url, port)
+        sys.exit(1)
+    threading.Thread(target=_auto_update_loop, daemon=True).start()
     print("=" * 60)
     print(" Emergency Hub Coordinator %s is running" % APP_VERSION)
     print(" Open:  " + url)

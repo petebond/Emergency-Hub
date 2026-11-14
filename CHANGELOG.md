@@ -2,6 +2,10 @@
 
 Each version's notes appear in the app under **Settings → About & updates** when it's available.
 
+## [1.1.1] - 2026-11-14
+
+- If Emergency Hub is already open in another window, starting it again now says so (and opens it in your browser) instead of showing a "page can't be found" error. If an older copy is still running, it tells you to close that window first.
+
 ## [1.1.0] - 2026-11-14
 
 - A tidier folder. The download now holds just an **Emergency Hub** shortcut with its own icon, an **app** folder (the program) and, once you've started it, a **data** folder (your contacts, settings and backups). Back up the data folder and you've got everything.
