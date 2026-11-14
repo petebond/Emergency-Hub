@@ -27,10 +27,11 @@ Free and open source under the MIT licence.
   postcodes on the map.
 
 <p>
-  <img src="docs/images/card.jpg" alt="A person's card, with their contact details, statuses and hub coordinator" width="49%">
-  <img src="docs/images/call-list.jpg" alt="A printed call list for one hub, with a map and a table of people to ring" width="24%">
-  <img src="docs/images/hub-groups.jpg" alt="The hub groups window, listing each hub coordinator's group" width="24%">
+  <img src="docs/images/card.jpg" alt="A person's card, with their contact details, statuses and hub coordinator" width="69%">
+  <img src="docs/images/call-list.jpg" alt="A printed call list for one hub, with a map and a table of people to ring" width="26.5%">
 </p>
+
+*Left: a person's card, where you tick their statuses and see their hub coordinator. Right: a printed call list for one hub.*
 
 ## Installing it (Windows)
 
