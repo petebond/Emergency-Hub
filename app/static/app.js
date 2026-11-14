@@ -13,7 +13,7 @@ let SETTINGS = {
   spoke_opacity: 0.7, spoke_color_mode: 'per_hub', spoke_color: '#1A9E77',
 };
 const CENTRE_PICK = '__centre__';
-const RESTART_MSG = 'The server is still running an older version. Close the black server window and run start.bat again, then refresh this page.';
+const RESTART_MSG = 'The server is still running an older version. Close the black server window and open Emergency Hub again, then refresh this page.';
 let settingsTab = 'org';     // which Settings tab is open
 let settingsDraft = null;   // unsaved Settings form values while picking the centre on the map
 
@@ -2053,7 +2053,7 @@ function updateBoxHtml(u) {
   let h = '';
   if (u.restart_pending) {
     h += `<div class="alert info">The new version is installed. ${u.mode === 'auto' ? 'The app is restarting&hellip;'
-      : 'To finish, close the black server window and double-click <b>start.bat</b> again, then refresh this page.'}</div>`;
+      : 'To finish, close the black server window and open <b>Emergency Hub</b> again, then refresh this page.'}</div>`;
   } else if (u.available && u.latest) {
     const pub = u.latest.published ? ` &middot; released ${esc(fmtDate(u.latest.published))}` : '';
     h += `<div class="update-card">
@@ -2113,7 +2113,7 @@ async function runUpdate(url, version, refresh) {
       if (v.version === version) { location.reload(); return; }
     } catch (e) { /* still restarting */ }
     if (Date.now() < until) setTimeout(poll, 1500);
-    else { busy(false); toast('The app hasn\'t come back yet. If the black server window has closed, double-click start.bat to start it again.', true); }
+    else { busy(false); toast('The app hasn\'t come back yet. If the black server window has closed, double-click Emergency Hub to start it again.', true); }
   };
   setTimeout(poll, 2500);
 }

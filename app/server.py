@@ -26,9 +26,15 @@ import webbrowser
 from datetime import datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
-BASE = os.path.dirname(os.path.abspath(__file__))
+BASE = os.path.dirname(os.path.abspath(__file__))      # the "app" folder: program files only
 STATIC = os.path.join(BASE, "static")
-CONFIG_PATH = os.environ.get("EHC_CONFIG", os.path.join(BASE, "config.json"))
+# Layout from 1.1.0:  Emergency Hub Coordinator\  Emergency Hub.lnk, app\ (this file), data\ (incl. config.json)
+# Copies from 1.0.0 kept everything in one folder (data\ and config.json next to server.py). Keep using that
+# layout if it's what is on disk, so an update installed from 1.0.0 still finds its data.
+LEGACY_LAYOUT = os.path.isdir(os.path.join(BASE, "data")) or os.path.isfile(os.path.join(BASE, "config.json"))
+HOME_DIR = BASE if LEGACY_LAYOUT else os.path.dirname(BASE)      # the folder that holds "data"
+CONFIG_PATH = os.environ.get("EHC_CONFIG") or (os.path.join(BASE, "config.json") if LEGACY_LAYOUT
+                                               else os.path.join(HOME_DIR, "data", "config.json"))
 
 
 def read_app_version():
@@ -118,7 +124,7 @@ def load_config():
 
 
 CFG = load_config()
-DATA_DIR = CFG["data_dir"] if os.path.isabs(CFG["data_dir"]) else os.path.join(BASE, CFG["data_dir"])
+DATA_DIR = CFG["data_dir"] if os.path.isabs(CFG["data_dir"]) else os.path.join(HOME_DIR, CFG["data_dir"])
 DB_PATH = os.path.join(DATA_DIR, "contacts.json")
 GEO_PATH = os.path.join(DATA_DIR, "geocache.json")
 BACKUP_DIR = os.path.join(DATA_DIR, "backups")
@@ -1847,7 +1853,7 @@ def _auto_lock_loop():
 
 # --------------------------------------------------------------------------- updates
 # New versions are published as GitHub releases. Each release carries:
-#   EmergencyHub-<version>-update.zip   the program files only (never data, config.json, start.bat or python/)
+#   EmergencyHub-<version>-update.zip   the app folder's program files (never data, config.json, the launcher or python/)
 #   update.json                         {"version", "file", "sha256", "size"} for the zip above
 # The app checks the latest release, and on request downloads the zip, checks its SHA-256 fingerprint,
 # keeps a copy of the current program files (so it can go back), puts the new files in place and restarts.
@@ -1857,9 +1863,9 @@ import zipfile
 UPDATE_API = os.environ.get("EHC_UPDATE_API", "https://api.github.com").rstrip("/")
 UPDATE_STATE_PATH = os.path.join(DATA_DIR, "update.json")     # not personal, so never encrypted
 UPDATE_DIR = os.path.join(BASE, ".update")                    # downloads and the copy of the previous version
-RESTART_CODE = 3                                              # start.bat starts the server again on this exit code
-# What an update may replace. Everything else (data, config.json, start.bat, python/) is left alone.
-UPDATE_FILES = ("VERSION", "server.py", "README.md", "CHANGELOG.md", "LICENSE", "Dockerfile", "contacts-template.csv")
+RESTART_CODE = 3                                              # the launcher starts the server again on this exit code
+# What an update may replace, inside the app folder. Everything else (data, config.json, the launcher, python/) is left alone.
+UPDATE_FILES = ("VERSION", "server.py", "README.md", "CHANGELOG.md", "LICENSE", "contacts-template.csv")
 UPDATE_DIRS = ("static", "demo", "tools")
 _UPD = {"busy": False, "lock": threading.Lock(), "restart_pending": False}
 
@@ -2412,7 +2418,7 @@ def main():
     print(" Emergency Hub Coordinator %s is running" % APP_VERSION)
     print(" Open:  " + url)
     print(" Data:  " + DATA_DIR + ("   (DEMO - made-up people)" if MODE["demo"] else ""))
-    print(" Close this window (or press Ctrl+C) to stop.")
+    print(" Keep this window open while you use the app. Close it to stop.")
     print("=" * 60)
     if CFG.get("open_browser"):
         threading.Timer(1.0, lambda: webbrowser.open(url)).start()

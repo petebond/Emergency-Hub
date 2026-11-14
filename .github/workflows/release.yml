@@ -1,5 +1,6 @@
 # Publishes a release when a version tag (for example v1.2.0) is pushed.
-# Steps for a new version: update VERSION and CHANGELOG.md, commit, then tag:  git tag v1.2.0 && git push --tags
+# Steps for a new version: update app/VERSION and CHANGELOG.md, commit, then tag:  git tag v1.2.0 && git push origin v1.2.0
+# Runs on Windows so the "Emergency Hub" shortcut is made by Windows itself, and the finished download is test-started there.
 name: Release
 
 on:
@@ -16,41 +17,76 @@ env:
 
 jobs:
   release:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: bash
     steps:
       - uses: actions/checkout@v4
 
-      - name: Check the tag matches VERSION
+      - name: Check the tag matches app/VERSION
         run: |
-          test "v$(cat VERSION)" = "$GITHUB_REF_NAME" || { echo "Tag $GITHUB_REF_NAME does not match VERSION $(cat VERSION)"; exit 1; }
-          grep -q "^## \[$(cat VERSION)\]" CHANGELOG.md || { echo "CHANGELOG.md has no section for $(cat VERSION)"; exit 1; }
+          V="$(tr -d '\r\n' < app/VERSION)"
+          test "v$V" = "$GITHUB_REF_NAME" || { echo "Tag $GITHUB_REF_NAME does not match app/VERSION $V"; exit 1; }
+          grep -q "^## \[$V\]" CHANGELOG.md || { echo "CHANGELOG.md has no section for $V"; exit 1; }
+          echo "VERSION=$V" >> "$GITHUB_ENV"
 
       - name: Check the code
         run: |
-          python3 -m py_compile server.py tools/build_release.py tools/make_demo.py
-          for f in static/*.js; do node --check "$f"; done
-
-      - name: Start the app and ask it its version
-        run: |
-          mkdir -p "$RUNNER_TEMP/ehc-data"
-          EHC_NO_BROWSER=1 EHC_DATA_DIR="$RUNNER_TEMP/ehc-data" EHC_CONFIG="$RUNNER_TEMP/ehc-data/config.json" EHC_PORT=8799 python3 server.py &
-          for i in $(seq 1 20); do sleep 1; curl -sf http://127.0.0.1:8799/api/version && break; done
-          curl -sf http://127.0.0.1:8799/api/version | grep -q "\"$(cat VERSION)\""
-          curl -sf http://127.0.0.1:8799/api/state > /dev/null
-          kill %1
+          python -m py_compile app/server.py tools/build_release.py app/tools/make_demo.py
+          for f in app/static/*.js; do node --check "$f"; done
 
       - name: Download the Windows Python
         run: |
           curl -fsSL -o python-embed.zip "https://www.python.org/ftp/python/${PY_EMBED_VERSION}/python-${PY_EMBED_VERSION}-embed-amd64.zip"
           echo "${PY_EMBED_SHA256}  python-embed.zip" | sha256sum -c -
 
+      - name: Make the Emergency Hub shortcut
+        shell: pwsh
+        run: |
+          # Points at the launcher by a path relative to the shortcut's own folder, so it works wherever the zip is unzipped.
+          # The launcher rewrites it with full paths and the app's icon the first time it runs.
+          New-Item -ItemType Directory -Force build | Out-Null
+          $s = (New-Object -ComObject WScript.Shell).CreateShortcut((Join-Path $PWD 'build\Emergency Hub.lnk'))
+          $s.TargetPath = '%SystemRoot%\System32\cmd.exe'
+          $s.Arguments = '/c "app\Start Emergency Hub.bat"'
+          $s.WorkingDirectory = ''
+          $s.IconLocation = 'app\static\emergency-hub.ico,0'
+          $s.Description = 'Start Emergency Hub Coordinator'
+          $s.Save()
+          Get-Item 'build\Emergency Hub.lnk' | Format-List Name, Length
+
       - name: Build
         run: |
-          python3 tools/build_release.py --python-zip python-embed.zip --out dist
-          python3 tools/build_release.py --notes "$(cat VERSION)" > notes.md
+          python tools/build_release.py --python-zip python-embed.zip --shortcut "build/Emergency Hub.lnk" --out dist
+          python tools/build_release.py --notes "$VERSION" > notes.md
           ls -l dist
+
+      - name: Test the download on Windows
+        shell: pwsh
+        run: |
+          $t = Join-Path $env:RUNNER_TEMP 'unzip test (1)'
+          Expand-Archive -Path "dist\EmergencyHub-$env:VERSION-windows.zip" -DestinationPath $t
+          $root = Join-Path $t 'Emergency Hub Coordinator'
+          Get-ChildItem $root | Format-Table Name
+          $env:EHC_NO_BROWSER = '1'; $env:EHC_PORT = '8799'; $env:EHC_UPDATE_API = 'http://127.0.0.1:1'
+          # start it the way Explorer does: open the shortcut with its own folder as the current folder
+          Start-Process -FilePath (Join-Path $root 'Emergency Hub.lnk') -WorkingDirectory $root
+          $ok = $false
+          for ($i = 0; $i -lt 40 -and -not $ok; $i++) {
+            Start-Sleep -Seconds 1
+            try { $v = Invoke-RestMethod http://127.0.0.1:8799/api/version; if ($v.version -eq $env:VERSION) { $ok = $true } } catch {}
+          }
+          if (-not $ok) { throw 'The app did not start from the shortcut' }
+          Invoke-RestMethod http://127.0.0.1:8799/api/state | Out-Null
+          if (-not (Test-Path (Join-Path $root 'data\config.json'))) { throw 'data\config.json was not created next to the app folder' }
+          $lnk = (New-Object -ComObject WScript.Shell).CreateShortcut((Join-Path $root 'Emergency Hub.lnk'))
+          "Shortcut now: $($lnk.TargetPath) | icon $($lnk.IconLocation)"
+          if ($lnk.TargetPath -notlike '*app\Start Emergency Hub.bat') { throw 'The launcher did not update the shortcut' }
+          Get-Process python -ErrorAction SilentlyContinue | Stop-Process -Force
+          Get-ChildItem $root | Format-Table Name
 
       - name: Publish the release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "$GITHUB_REF_NAME" dist/* --title "Version $(cat VERSION)" --notes-file notes.md
+        run: gh release create "$GITHUB_REF_NAME" dist/* --title "Version $VERSION" --notes-file notes.md

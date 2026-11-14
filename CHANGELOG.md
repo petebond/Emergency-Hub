@@ -2,6 +2,13 @@
 
 Each version's notes appear in the app under **Settings → About & updates** when it's available.
 
+## [1.1.0] - 2026-11-14
+
+- A tidier folder. The download now holds just an **Emergency Hub** shortcut with its own icon, an **app** folder (the program) and, once you've started it, a **data** folder (your contacts, settings and backups). Back up the data folder and you've got everything.
+- `config.json` now lives in the data folder too.
+- Once you've started it, you can copy the Emergency Hub shortcut to your desktop.
+- Copies of version 1.0.0 that install this update keep their old folder layout and carry on working. To get the new layout, download the Windows zip, unzip it, and move your `data` folder and `config.json` across (put `config.json` inside `data`).
+
 ## [1.0.0] - 2026-11-14
 
 The first public release.

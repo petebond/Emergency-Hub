@@ -12,14 +12,27 @@ Free and open source under the MIT licence.
 
 1. Go to the [Releases page](https://github.com/petebond/Emergency-Hub/releases/latest) and download
    **EmergencyHub-x.y.z-windows.zip**.
-2. Unzip it somewhere permanent, such as your Documents folder. (Right-click → Extract All. Don't run it
-   from inside the zip.)
-3. Open the **Emergency Hub Coordinator** folder and double-click **`start.bat`**. A black window opens and
-   your browser goes to <http://127.0.0.1:8765>.
-4. Keep that window open while you use the app. Close it to stop.
+2. Right-click the zip, choose **Properties**, tick **Unblock** and click OK. (This stops Windows asking
+   whether you trust it every time it starts.)
+3. Unzip it somewhere permanent, such as your Documents folder: right-click → **Extract All**. Don't run it
+   from inside the zip.
+4. Open the **Emergency Hub Coordinator** folder and double-click **Emergency Hub**. A black window opens and
+   your browser goes to <http://127.0.0.1:8765>. Keep that window open while you use the app; close it to stop.
 
-The download includes its own copy of Python in the `python` folder, so nothing else needs installing.
-It opens in demo mode the first time, and the **?** button in the top right has a quick start guide.
+The folder looks like this:
+
+```
+Emergency Hub Coordinator\
+   Emergency Hub          the shortcut to double-click (copy it to the desktop if you like)
+   app\                   the program, including its own copy of Python - updates replace this
+   data\                  your contacts, settings, backups and config.json - back this up
+```
+
+`data` appears the first time you start it. Nothing else needs installing. It opens in demo mode the
+first time, and the **?** button in the top right has a quick start guide.
+
+If Windows shows "Windows protected your PC", click **More info** then **Run anyway**. It does that for
+programs from the internet that aren't signed by a software company.
 
 ## Updating
 
@@ -28,18 +41,19 @@ appears on the Settings button. **Settings → About & updates** shows what's ne
 click: the app downloads the update, checks it against the SHA-256 fingerprint published with the
 release, keeps the current version so you can go back, puts the new files in place and restarts.
 
-An update only replaces the program files (`server.py`, `VERSION`, `static`, `demo`, `tools` and the
-documents). It never touches `data`, `config.json`, `start.bat` or the bundled `python` folder. The
+An update only replaces program files inside `app` (`server.py`, `VERSION`, `static`, `demo`, `tools` and
+the documents). It never touches `data` (including `config.json`), the launcher or the bundled `python` folder. The
 check only contacts GitHub (api.github.com and its download servers), which sees your internet address
 and nothing else.
 
-To update by hand instead, download the new Windows zip, unzip it, and copy your `data` folder (and
-`config.json` if you've changed it) into the new folder.
+To update by hand instead, download the new Windows zip, unzip it, and copy your `data` folder into the new
+folder.
 
 ## Running from the source code
 
-If you'd rather not use the release download, clone this repository and run `python server.py` (or
-`start.bat`) with Python 3.10 or newer. Only the standard library is used.
+If you'd rather not use the release download, clone this repository and run `python app/server.py` with
+Python 3.10 or newer. Only the standard library is used. Your data goes in a `data` folder at the top of
+the repository, which git ignores.
 
 ## Demo mode
 
@@ -105,12 +119,12 @@ notes never leave this PC.
 - `data/churchsuite.json`: the ChurchSuite Client ID, Secret and tags. Keep this file private.
 - `data/vault.json`: present when encryption is on. It holds the salt and a check value (never the passphrase). Without the passphrase the other data files cannot be read.
 - `data/update.json`: whether to check for updates, and what the last check found. Nothing personal.
-- `config.json`: port, and whether other devices can connect. Its centre name and postcode are only used the first time; after that the centre is changed on the Settings page. This file is created on first run.
-- `.update/`: the previous version's program files, kept after an update so you can go back.
+- `data/config.json`: port, and whether other devices can connect. Its centre name and postcode are only used the first time; after that the centre is changed on the Settings page. This file is created on first run.
+- `app/.update/`: the previous version's program files, kept after an update so you can go back.
 
 The data includes sensitive information such as who is vulnerable. By default the site only
 accepts connections from this PC (`"host": "127.0.0.1"`). To use it from other devices on
-your network, set `"host": "0.0.0.0"` in `config.json`.
+your network, set `"host": "0.0.0.0"` in `data/config.json`.
 
 ## Moving to Home Assistant / a home server later
 The app uses only the standard Python library, so you can copy the folder to any machine
@@ -126,9 +140,9 @@ In Docker the app tells you about new versions but doesn't update itself: rebuil
 
 ## Publishing a new version (for maintainers)
 
-1. Change the number in `VERSION` (for example `1.1.0`) and add a `## [1.1.0] - date` section to
+1. Change the number in `app/VERSION` (for example `1.2.0`) and add a `## [1.2.0] - date` section to
    `CHANGELOG.md`. That section becomes the release notes people see in the app, so write it for them.
-2. Commit, then tag and push: `git tag v1.1.0 && git push origin main --tags`.
+2. Commit, then tag and push: `git tag v1.2.0 && git push origin main v1.2.0`.
 3. The **Release** GitHub Action checks the code, starts the app, builds the Windows zip (with
    Python) and the update zip, and publishes the release. Every copy of the app will offer it within a day.
 

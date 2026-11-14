@@ -3,12 +3,14 @@ data/
 config.json
 github-token.txt
 # created by the app
-.update/
+app/.update/
+app/.shortcut
 __pycache__/
 *.pyc
 # the bundled Windows Python and release builds
-python/
+app/python/
 dist/
+build/
 python-embed.zip
 # working files
 Claude outputs/

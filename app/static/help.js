@@ -54,7 +54,7 @@
         <ul>
           <li><b>Upload a CSV file.</b> Export your address list from your church database or spreadsheet as a CSV file, then click
           <b>Upload contacts CSV</b> in the title bar or drag the file onto the page. First and last names are essential, and addresses,
-          postcodes and phone numbers make it useful. There's an example, <i>contacts-template.csv</i>, in the app's folder,
+          postcodes and phone numbers make it useful. There's an example, <i>contacts-template.csv</i>, in the <i>app</i> folder,
           and the FAQ explains <a data-faq="csv">which columns it understands</a>.</li>
           <li><b>Connect ChurchSuite.</b> If your church uses ChurchSuite, the app can fetch the list for you. You set it up once in
           <a data-act="settings:data">Settings &rarr; Data &amp; privacy</a>, choose which tags to include, and from then on click
@@ -157,8 +157,9 @@
         },
         {
           id: 'stored', q: 'Where is everything kept?',
-          a: `<p>In the <b>data</b> folder, next to <i>start.bat</i>. <i>contacts.json</i> holds everyone with their statuses and notes, <i>backups</i> has a copy
-            taken before each upload (the last 30 are kept), and <i>demo</i> holds the demo church. The <i>tiles</i> folder is the stored street map, which you can clear in
+          a: `<p>In the <b>data</b> folder, next to the <b>Emergency Hub</b> shortcut. <i>contacts.json</i> holds everyone with their statuses and notes,
+            <i>backups</i> has a copy taken before each upload (the last 30 are kept), <i>config.json</i> has a few technical settings, and <i>demo</i> holds the
+            demo church. The <i>app</i> folder next to it is the program itself, which updates replace, so there's no need to back that up. The <i>tiles</i> folder is the stored street map, which you can clear in
             <a data-act="settings:look">Settings &rarr; Look and feel</a>.</p>`,
         },
         {
@@ -193,7 +194,7 @@
         {
           id: 'network', q: 'Can other people use it from their own computers?',
           a: `<p>Not as it comes. The app only accepts connections from the computer it's running on, and that's deliberate. It's possible to open it up to other
-            devices on your network by changing <i>host</i> to <i>0.0.0.0</i> in <i>config.json</i>, but anyone on that network could then reach it, so turn on
+            devices on your network by changing <i>host</i> to <i>0.0.0.0</i> in <i>data\\config.json</i>, but anyone on that network could then reach it, so turn on
             encryption first and think carefully about whether you need to.</p>
             <p>For most churches it works best with one or two people looking after it on one computer, and everyone else using the printed call lists.</p>`,
         },
@@ -216,7 +217,7 @@
           a: `<p>The first row should be column headings. The app looks for <i>First Name, Last Name, Address 1, Address 2, Town/City, County, Postcode, Country,
             Telephone, Mobile</i> and <i>Email</i>, and it's fairly relaxed about the exact wording, so <i>Surname</i>, <i>Street</i>, <i>Phone</i> or
             <i>Email Address</i> all work too. Only first and last name are essential, and any extra columns are ignored.</p>
-            <p>Have a look at <i>contacts-template.csv</i> in the app's folder for an example. Most church databases and spreadsheet programs can save a CSV file.</p>`,
+            <p>Have a look at <i>contacts-template.csv</i> in the <i>app</i> folder for an example. Most church databases and spreadsheet programs can save a CSV file.</p>`,
         },
         {
           id: 'reupload', q: 'What happens when I upload a new list?',
@@ -399,7 +400,7 @@
         },
         {
           id: 'update-safe', q: 'Will an update touch our data?',
-          a: `<p>No. An update only replaces the program's own files. Your <i>data</i> folder, your settings, your passphrase and <i>config.json</i> are left alone.
+          a: `<p>No. An update only replaces the program's own files. Your <i>data</i> folder, with all your settings, and your passphrase are left alone.
             Before installing, the app checks the download against a fingerprint published with the release and refuses it if they don't match, and it keeps
             the version you had so you can go back to it from the same page. If a new version ever needs to change how the data is stored, it makes a backup first.</p>`,
         },
@@ -415,21 +416,30 @@
       cat: 'Troubleshooting',
       items: [
         {
-          id: 'start', q: 'Nothing happens when I double-click start.bat.',
-          a: `<p>The download from the Releases page comes with its own copy of Python in the <i>python</i> folder, so there's nothing else to install.
-            If the black window says Python can't be found, that folder is missing: download the latest Windows zip again, unzip the whole thing,
-            and copy your <i>data</i> folder across from the old copy. (If you run the app from the source code instead, you'll need Python 3 from python.org.)</p>
-            <p>If the window stays open but the browser doesn't appear, go to <b>http://127.0.0.1:8765</b> in your browser.</p>`,
+          id: 'start', q: 'Nothing happens when I double-click Emergency Hub.',
+          a: `<p>First, make sure you've unzipped the download rather than opening it from inside the zip file, and that the <b>Emergency Hub</b> shortcut
+            is still next to the <i>app</i> folder. If Windows shows a blue "Windows protected your PC" box, click <b>More info</b> and then <b>Run anyway</b>;
+            it does this for programs downloaded from the internet that aren't from a big software company. You can avoid it next time by right-clicking the zip,
+            choosing <b>Properties</b>, ticking <b>Unblock</b> and then unzipping.</p>
+            <p>The download comes with its own copy of Python in <i>app\\python</i>, so there's nothing else to install. If the black window says Python can't be found,
+            download the latest Windows zip again, unzip it, and copy your <i>data</i> folder across from the old copy. If the window stays open but the browser
+            doesn't appear, go to <b>http://127.0.0.1:8765</b> in your browser.</p>`,
+        },
+        {
+          id: 'shortcut', q: 'Can I put Emergency Hub on the desktop?',
+          a: `<p>Yes. Once the app has been started at least once, right-click the <b>Emergency Hub</b> shortcut, choose <b>Copy</b>, and paste it on the desktop
+            or wherever suits you. If you ever move the whole Emergency Hub Coordinator folder, start it once from inside the folder and copies of the shortcut
+            will work again.</p>`,
         },
         {
           id: 'cant-connect', q: 'The browser says it can\'t connect.',
-          a: `<p>The black server window has to stay open while you use the app, because that's what runs it. If you've closed it, double-click <i>start.bat</i>
-            again and refresh the page.</p>`,
+          a: `<p>The black server window has to stay open while you use the app, because that's what runs it. If you've closed it, double-click
+            <b>Emergency Hub</b> again and refresh the page.</p>`,
         },
         {
           id: 'older-version', q: 'It says the server is running an older version.',
           a: `<p>That happens when the app's files have been replaced while the old version was still running, for example after copying in new files by hand.
-            Close the black server window, double-click <i>start.bat</i> again, then refresh the page. Updates installed from
+            Close the black server window, double-click <b>Emergency Hub</b> again, then refresh the page. Updates installed from
             <a data-act="settings:about">Settings &rarr; About &amp; updates</a> restart the app for you, so this shouldn't happen with those.</p>`,
         },
         {
