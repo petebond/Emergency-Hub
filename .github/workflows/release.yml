@@ -1,10 +1,12 @@
 # Publishes a release when a version tag (for example v1.2.0) is pushed.
+# Every push to main runs the same checks, build and Windows test, without publishing anything.
 # Steps for a new version: update app/VERSION and CHANGELOG.md, commit, then tag:  git tag v1.2.0 && git push origin v1.2.0
 # Runs on Windows so the "Emergency Hub" shortcut is made by Windows itself, and the finished download is test-started there.
 name: Release
 
 on:
   push:
+    branches: [main]
     tags: ["v*.*.*"]
 
 permissions:
@@ -22,14 +24,16 @@ jobs:
       run:
         shell: bash
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - name: Check the tag matches app/VERSION
+      - name: Check the version number
         run: |
           V="$(tr -d '\r\n' < app/VERSION)"
-          test "v$V" = "$GITHUB_REF_NAME" || { echo "Tag $GITHUB_REF_NAME does not match app/VERSION $V"; exit 1; }
-          grep -q "^## \[$V\]" CHANGELOG.md || { echo "CHANGELOG.md has no section for $V"; exit 1; }
           echo "VERSION=$V" >> "$GITHUB_ENV"
+          if [ "$GITHUB_REF_TYPE" = "tag" ]; then
+            test "v$V" = "$GITHUB_REF_NAME" || { echo "Tag $GITHUB_REF_NAME does not match app/VERSION $V"; exit 1; }
+            grep -q "^## \[$V\]" CHANGELOG.md || { echo "CHANGELOG.md has no section for $V"; exit 1; }
+          fi
 
       - name: Check the code
         run: |
@@ -88,6 +92,7 @@ jobs:
           Get-ChildItem $root | Format-Table Name
 
       - name: Publish the release
+        if: github.ref_type == 'tag'
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh release create "$GITHUB_REF_NAME" dist/* --title "Version $VERSION" --notes-file notes.md
