@@ -126,6 +126,7 @@ if __name__ == "__main__":
     ap.add_argument("--notes", metavar="VERSION", help="print the CHANGELOG section for VERSION and stop")
     a = ap.parse_args()
     if a.notes:
-        sys.stdout.write(changelog_section(a.notes))
+        # write bytes, so arrows and accents survive the Windows console's default code page
+        sys.stdout.buffer.write(changelog_section(a.notes).encode("utf-8"))
     else:
         build(a.python_zip, a.shortcut, a.out)
