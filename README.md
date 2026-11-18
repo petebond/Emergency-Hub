@@ -22,9 +22,9 @@ Free and open source under the MIT licence.
   phone numbers, notes and tick boxes. The app reminds you when the paper copies are out of date.
 - **Keeps itself current.** Upload a CSV from any church database, or sync straight from
   [ChurchSuite](#using-it-with-churchsuite).
-- **Looks after the data.** Optional encryption with a passphrase, a Data Protection Pack explaining
-  your responsibilities under UK law, and nothing sent anywhere except what's needed to put
-  postcodes on the map.
+- **Looks after the data.** Designed around an opt-in list, optional encryption with a passphrase,
+  a Data Protection Pack explaining your responsibilities under UK law, and nothing sent anywhere
+  except what's needed to put postcodes on the map.
 
 <p>
   <img src="docs/images/card.jpg" alt="A person's card, with their contact details, statuses and hub coordinator" width="69%">
@@ -83,8 +83,9 @@ directly instead of you exporting and uploading a CSV file. It uses the ChurchSu
 
 - **Read-only.** It asks ChurchSuite for the `addressbook.read` permission only, and never creates,
   changes or deletes anything in ChurchSuite.
-- **Only the people you choose.** You tick which ChurchSuite tags to include (for example Attender
-  and Partner), and it fetches active contacts with any of those tags. Nobody else is downloaded.
+- **Only the people who opted in.** You tick which ChurchSuite tags to include, and it fetches active
+  contacts with any of those tags. Nobody else is downloaded. We recommend a single opt-in tag (see
+  below) rather than broad tags such as Attender or Partner.
 - **Only the details it needs:** names, address, phone numbers and email. ChurchSuite's own map
   position is used when a contact has one, so fewer postcodes need looking up.
 - **Your keys stay with you.** The Client ID and Secret are stored only on the church's own computer
@@ -97,15 +98,33 @@ directly instead of you exporting and uploading a CSV file. It uses the ChurchSu
   than five people), usually because a tag has been changed, the app stops and asks first. A backup
   is taken before every sync, and it waits politely if ChurchSuite asks it to slow down.
 
+**Opt-in: the Emergency Hub tag**
+
+The plan prints people's names, addresses and phone numbers and hands them to a hub coordinator, so
+we recommend that people choose to be included. Caring for people is part of a church's purpose, and
+you may well have a lawful basis for including everyone anyway, but asking first is best practice:
+people make an informed choice, nobody is surprised to get a call, and you have a record of who
+agreed. The Data Protection Pack includes wording for inviting people to opt in.
+
+In ChurchSuite, create a tag called **Emergency Hub** and add it only to people who say yes (a note
+on their record of the date they agreed is useful). The app marks that tag as *opt-in*, ticks it
+automatically on a new connection, and warns you if it isn't ticked or if broader tags are ticked as
+well. If someone changes their mind, remove the tag and they come off the list at the next sync.
+
 **Setting it up**
 
-1. In ChurchSuite, an Administrator creates a dedicated user with **view-only Address Book**
-   permission, turns on API access for it, and generates a **Client ID** and **Client Secret**.
-2. In the app, open **Menu → Settings → Data & privacy**, paste both in and click **Connect to
+1. In ChurchSuite, create the **Emergency Hub** tag and add it to everyone who has opted in.
+2. An Administrator creates a dedicated user with **view-only Address Book** permission, turns on API
+   access for it, and generates a **Client ID** and **Client Secret**.
+3. In the app, open **Menu → Settings → Data & privacy**, paste both in and click **Connect to
    ChurchSuite**.
-3. Tick the tags to include. The app shows how many people that covers.
-4. Choose **Menu → Sync from ChurchSuite** whenever you want the latest list. You'll see a report of
+4. Tick the **Emergency Hub** tag (and nothing else). The app shows how many people that covers.
+5. Choose **Menu → Sync from ChurchSuite** whenever you want the latest list. You'll see a report of
    who was added, removed or changed.
+
+If you're switching an existing list from broad tags to the opt-in tag, the first sync removes
+everyone who hasn't opted in, together with their statuses and notes. The app asks you to confirm and
+takes a backup first.
 
 ## Running from the source code
 
@@ -135,8 +154,8 @@ A new installation opens in **demo mode**: a made-up church ("Riverside Communit
 
 | What | How |
 |---|---|
-| ChurchSuite | In **Settings → Data & privacy**, enter the Client ID and Secret of a dedicated ChurchSuite API user (view-only Address Book permission) and press **Connect to ChurchSuite**. Your ChurchSuite tags then appear as tick boxes (grouped by category); tick the ones to include (e.g. Attender, Partner). The tag list is refreshed on every sync, and tags are remembered by their ChurchSuite ID, so renaming a tag in ChurchSuite does not break anything. **Sync from ChurchSuite** then fetches everyone with any of those tags and updates the list the same way as a CSV upload. It is read-only and never changes ChurchSuite. People are matched by their ChurchSuite record, and ChurchSuite's own map positions are used where available. If a sync would remove a large share of people, you are asked to confirm first. |
-| Load or refresh contacts | **Upload contacts CSV** (or drag a CSV onto the page). Each upload counts as the *complete* list. New people are added, people missing from the file are removed, and changed details are updated. |
+| ChurchSuite | In **Settings → Data & privacy**, enter the Client ID and Secret of a dedicated ChurchSuite API user (view-only Address Book permission) and press **Connect to ChurchSuite**. Your ChurchSuite tags then appear as tick boxes (grouped by category); tick the ones to include. We recommend a single opt-in tag called **Emergency Hub**, given only to people who have agreed to be part of the plan, and the app warns you if it isn't ticked or broader tags are ticked too. The tag list is refreshed on every sync, and tags are remembered by their ChurchSuite ID, so renaming a tag in ChurchSuite does not break anything. **Sync from ChurchSuite** then fetches everyone with any of those tags and updates the list the same way as a CSV upload. It is read-only and never changes ChurchSuite. People are matched by their ChurchSuite record, and ChurchSuite's own map positions are used where available. If a sync would remove a large share of people, you are asked to confirm first. |
+| Load or refresh contacts | **Upload contacts CSV** (or drag a CSV onto the page). Export only the people who have opted in. Each upload counts as the *complete* list. New people are added, people missing from the file are removed, and changed details are updated. |
 | See what an upload changed | The changes report opens after every upload. Older reports are under **Changes report**. |
 | Table view | **Table view** lists everyone in a scrollable table with a tick box for each status, so you can set statuses (including Hub Coordinator) quickly after the first upload. Filter by status, search by name, or enter a postcode and a distance (for example SP8 4GR, 0.5 miles) to list only people within that distance. Click a column heading to sort. The map is not affected. |
 | Contact card | Click a dot. Clicking a numbered cluster zooms in, or fans the dots out when they share an address or postcode. |
@@ -151,7 +170,7 @@ A new installation opens in **demo mode**: a made-up church ("Riverside Communit
 | Settings | **Settings** (in the menu, top right) sets your organisation's name and logo for the title bar (each can be hidden), light or dark mode, the central hub's name, location (by postcode, or by clicking a spot on the map) and marker (colour, size, and a star, your logo or another image), the status colours, dot size, line widths and line colours. **Dark mode** / **Light mode** in the menu switches between them. Settings are saved in the `data` folder, so they move with it. |
 | Statuses | **Settings → Statuses** lets you rename, recolour, reorder (priority), add and remove statuses. Hub Coordinator can be renamed but not removed. |
 | Encryption | **Settings → Data & privacy → Encryption** encrypts the contact data, backups and ChurchSuite details with a passphrase (at least 12 characters). The app then asks for it when it starts, when **Lock now** in the menu is clicked and after the auto-lock time. **If the passphrase is lost the data cannot be recovered.** |
-| Data Protection Pack | **Settings → Data & privacy → Create Data Protection Pack** downloads a PDF in your branding explaining your responsibilities under UK data protection law, with a privacy notice paragraph, a risk assessment outline, a hub coordinator confidentiality agreement and checklists. General guidance, not legal advice. |
+| Data Protection Pack | **Settings → Data & privacy → Create Data Protection Pack** downloads a PDF in your branding explaining your responsibilities under UK data protection law, with wording for inviting people to opt in, a privacy notice paragraph, a risk assessment outline, a hub coordinator confidentiality agreement and checklists. General guidance, not legal advice. |
 | Map without internet | Every part of the street map you view is stored on this PC (in `data/tiles`, up to 500 MB) and used first, so areas you have looked at still show if the internet is down. Browse and zoom in on your area beforehand. The satellite view always needs the internet. Clear the stored map in Settings → Look and feel. (OpenStreetMap's rules don't allow downloading whole areas in advance.) |
 | Backup / spreadsheet | **Export CSV** downloads everyone with their statuses, hub and notes. |
 

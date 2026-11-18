@@ -53,14 +53,20 @@
       id: 'contacts',
       title: 'Bring in your contact list',
       html: `
-        <p>There are two ways to do this.</p>
+        <p>First, decide who goes on the list. We recommend making it <b>opt-in</b>: ask people whether they would like to be part of the
+        emergency plan, explaining that their name, address and phone numbers will be printed and given to a hub coordinator who lives nearby,
+        and include only those who say yes. Caring for people is part of what a church does, so you may well have a lawful reason to include
+        everyone anyway, but asking first is best practice. It means nobody is surprised to get a call, and it makes the data protection side
+        simpler (<a data-faq="opt-in">more about opting in</a>).</p>
+        <p>Then bring the list in. There are two ways to do this.</p>
         <ul>
-          <li><b>Upload a CSV file.</b> Export your address list from your church database or spreadsheet as a CSV file, then click
+          <li><b>Upload a CSV file.</b> Export the people who have opted in from your church database or spreadsheet as a CSV file, then click
           <b>Upload contacts CSV</b> in the menu, or drag the file onto the page. First and last names are essential, and addresses,
           postcodes and phone numbers make it useful. There's an example, <i>contacts-template.csv</i>, in the <i>app</i> folder,
           and the FAQ explains <a data-faq="csv">which columns it understands</a>.</li>
-          <li><b>Connect ChurchSuite.</b> If your church uses ChurchSuite, the app can fetch the list for you. You set it up once in
-          <a data-act="settings:data">Settings &rarr; Data &amp; privacy</a>, choose which tags to include, and from then on click
+          <li><b>Connect ChurchSuite.</b> If your church uses ChurchSuite, the app can fetch the list for you. In ChurchSuite, create a tag
+          called <b>Emergency Hub</b> and add it to everyone who has opted in. Then connect the app once in
+          <a data-act="settings:data">Settings &rarr; Data &amp; privacy</a>, tick the Emergency Hub tag, and from then on click
           <b>Sync from ChurchSuite</b> in the menu whenever you want the latest list. The FAQ has <a data-faq="churchsuite">step-by-step instructions for connecting it</a>.</li>
         </ul>
         <p>Either way, the app looks up each postcode to put people on the map, then shows you a report of who was added, removed or changed.</p>
@@ -77,8 +83,8 @@
           <li><b>Turn on encryption.</b> The data on this computer then can't be read without a passphrase. Agree where the passphrase will be kept
           before you switch it on, because if it's lost there's no way to get the data back. There's <a data-faq="encryption">more about encryption</a> in the FAQ.</li>
           <li><b>Create the Data Protection Pack.</b> Add your data protection lead's name and contact details, then create the pack. It's a PDF in your
-          church's branding that explains your responsibilities under UK law, with a paragraph for your privacy notice and a confidentiality
-          agreement for hub coordinators to sign.</li>
+          church's branding that explains your responsibilities under UK law, with wording for inviting people to opt in, a paragraph for your
+          privacy notice and a confidentiality agreement for hub coordinators to sign.</li>
         </ul>
         <p>If you plan to record who is vulnerable, or anything about people's health, both of these are well worth doing before you start ticking boxes.</p>`,
     },
@@ -150,6 +156,18 @@
     {
       cat: 'Your data and privacy',
       items: [
+        {
+          id: 'opt-in', q: 'Do people need to agree to be on the list?',
+          a: `<p>We recommend it. Caring for people is part of a church's purpose, so there is a reasonable argument that you could include everyone on your
+            list without asking. But the plan involves printing people's names, addresses and phone numbers and handing them to someone else in the church,
+            so asking first is best practice. People make an informed choice, nobody is surprised to get a call, and you have a clear record of who agreed.</p>
+            <p>In ChurchSuite, create a tag called <b>Emergency Hub</b>, add it only to people who say yes, and tick only that tag in
+            <a data-act="settings:data">Settings &rarr; Data &amp; privacy</a>. If you upload a CSV instead, keep a similar tag, group or column in your
+            database and export just those people. If someone changes their mind, remove the tag and they come off the list at the next update.</p>
+            <p>The Data Protection Pack has wording you can use when inviting people to opt in, and explains how this fits with UK data protection law.
+            You can invite people through your newsletter, a notice, a form at a welcome event or by asking them directly. Whether someone needs extra help
+            (for example the Vulnerable status) is worth asking about separately, with their agreement recorded.</p>`,
+        },
         {
           id: 'leaves', q: 'Does any of our information leave this computer?',
           a: `<p>Only what's needed to find addresses on the map. To put people on the map, the app sends postcodes to <b>postcodes.io</b>, a free UK postcode
@@ -248,7 +266,9 @@
           a: `<p>Someone with Administrator access to ChurchSuite needs to turn on API access for a user who can only <i>view</i> the Address Book, then create a
             <b>Client ID</b> and <b>Client Secret</b> for that user. Paste both into <a data-act="settings:data">Settings &rarr; Data &amp; privacy</a> and click
             <b>Connect to ChurchSuite</b>.</p>
-            <p>The app then shows your ChurchSuite tags. Tick the ones that should be included (anyone with any ticked tag is fetched), and use
+            <p>Before you connect, create a tag in ChurchSuite called <b>Emergency Hub</b> and add it to everyone who has opted in to the emergency plan
+            (<a data-faq="opt-in">why opt-in?</a>). It helps to record the date each person agreed, for example in a note on their record.</p>
+            <p>The app then shows your ChurchSuite tags, with the Emergency Hub tag marked <b>opt-in</b>. Tick just that tag (anyone with any ticked tag is fetched), and use
             <b>Sync from ChurchSuite</b> in the menu whenever you want the latest list. The link only reads from ChurchSuite and never changes anything there.
             The secret is stored on this computer only.</p>`,
         },
@@ -256,7 +276,10 @@
           id: 'sync-confirm', q: 'Why did a ChurchSuite sync ask me to confirm?',
           a: `<p>If a sync would remove a large part of your list (more than about 30%, and more than five people), the app stops and asks first. That usually means a
             tag has been changed or emptied in ChurchSuite, and it saves you losing everyone's statuses by accident. Check your tags, and only go ahead if the
-            removals are what you expect.</p>`,
+            removals are what you expect.</p>
+            <p>You'll also see this the first time you switch from broad tags (such as Attender or Partner) to an opt-in tag, because everyone who hasn't opted
+            in is removed along with their statuses and notes. That's expected. A backup is taken first, and anyone who opts in later comes back on the next sync
+            (their statuses will need ticking again).</p>`,
         },
         {
           id: 'how-often', q: 'How often should we update the list?',

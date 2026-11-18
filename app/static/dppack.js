@@ -47,15 +47,16 @@ async function buildDataProtectionPack(state, draft) {
   let y = 0;
   const LH = 4.4;
 
-  const font = (style, size, colour) => { doc.setFont('helvetica', style); doc.setFontSize(size); doc.setTextColor(colour || '#1D2330'); };
+  let lastFont = ['normal', 9.5];
+  const font = (style, size, colour, keep) => { doc.setFont('helvetica', style); doc.setFontSize(size); doc.setTextColor(colour || '#1D2330'); if (!keep) lastFont = [style, size, colour]; };
   const header = () => {
     let x = M;
     if (logo) { const h = 8; const w = Math.min(24, h * logo.ratio); doc.addImage(logo.data, 'PNG', M, 9, w, w / logo.ratio); x = M + w + 3; }
-    font('bold', 9, accentText); doc.text(org, x, 14);
-    font('normal', 8, '#667085'); doc.text('Data Protection Pack - emergency contact planning', W - M, 14, { align: 'right' });
+    font('bold', 9, accentText, true); doc.text(org, x, 14);
+    font('normal', 8, '#667085', true); doc.text('Data Protection Pack - emergency contact planning', W - M, 14, { align: 'right' });
     doc.setDrawColor(accent); doc.setLineWidth(0.6); doc.line(M, 19, W - M, 19);
   };
-  const newPage = () => { doc.addPage(); header(); y = 28; };
+  const newPage = () => { doc.addPage(); header(); font(...lastFont); y = 28; };  // carry on in the same text style
   const ensure = (h) => { if (y + h > H - 18) newPage(); };
   const gap = (n = 2) => { y += n; };
 
@@ -174,27 +175,29 @@ async function buildDataProtectionPack(state, draft) {
   ], [32, 68], { boldFirst: true, noHead: true });
   box('About this pack', [
     `${org} uses Emergency Hub Coordinator to plan how people will be contacted in an emergency: who is a hub coordinator, who is in each hub's group, and who may need extra help. Because the list holds personal information, and some of it may be sensitive, ${org} must handle it in line with UK data protection law.`,
-    'This pack explains those responsibilities in plain English and gives you ready-to-use material: a privacy notice paragraph, a risk assessment outline, a confidentiality agreement for hub coordinators, and checklists.',
+    'This pack explains those responsibilities in plain English and gives you ready-to-use material: wording for inviting people to opt in, a privacy notice paragraph, a risk assessment outline, a confidentiality agreement for hub coordinators, and checklists.',
     'It is general guidance, not legal advice. Check your approach against the ICO guidance listed at the end, or with your diocese, denomination, umbrella body or a data protection adviser.',
   ]);
-  para('Contents: 1 At a glance  -  2 The law  -  3 Lawful basis  -  4 What the system holds  -  5 Privacy notice  -  6 Risk assessment (DPIA)  -  7 Security  -  8 Sharing  -  9 Accuracy and retention  -  10 Rights and complaints  -  11 Data breaches  -  12 Hub coordinator agreement  -  13 Annual review  -  14 References', { size: 8.5, colour: '#667085' });
+  para('Contents: 1 At a glance  -  2 The law  -  3 Lawful basis and opting in  -  4 What the system holds  -  5 Opt-in wording and privacy notice  -  6 Risk assessment (DPIA)  -  7 Security  -  8 Sharing  -  9 Accuracy and retention  -  10 Rights and complaints  -  11 Data breaches  -  12 Hub coordinator agreement  -  13 Annual review  -  14 References', { size: 8.5, colour: '#667085' });
 
   // ------------------------------------------------------------------ 1 at a glance
   newPage();
   h1('1. At a glance');
   table(['Question', 'Answer for ' + org], [
     ['Who is responsible?', `${org} is the "data controller" - it decides why and how the information is used, and is accountable for it. ${lead} is the day-to-day lead.`],
+    ['Who is included?', 'Only people who have chosen to join the plan (opted in), for example those given an "Emergency Hub" tag in your church database.'],
     ['What is held?', 'Names, addresses, phone numbers and email addresses copied from your church database, the statuses you tick (listed in section 4), hub assignments and any notes.'],
     ['Why?', 'To plan and carry out contact with people in an emergency, and to make sure those who may need extra help are checked on first.'],
     ['Where is it kept?', `On one computer, in the app's data folder. Encryption is ${sec.encrypted ? 'ON' : 'OFF'}. It is not stored online by the software's authors.`],
     ['Who sees it?', 'The people who run the system, and each hub coordinator sees only their own group (on screen or on a printed call list).'],
-    ['How long?', 'For as long as the person is part of your church database with the chosen tags. When they leave, the next update removes them.'],
+    ['How long?', 'For as long as the person stays opted in and on your church database. When they withdraw or leave, the next update removes them.'],
     ['Main law', 'UK GDPR, the Data Protection Act 2018 and the Data (Use and Access) Act 2025. Regulator: the Information Commissioner\'s Office (ICO).'],
   ], [30, 70], { boldFirst: true });
   h2('Your first steps');
   checklist([
     `Name a data protection lead (${lead}) and agree who may use the system.`,
     'Decide and write down your lawful basis and special category condition (section 3).',
+    'Invite people to opt in using the wording in section 5. Tag those who agree (for example "Emergency Hub" in ChurchSuite) and keep a record of when they agreed.',
     'Add the privacy notice paragraph (section 5) to your existing privacy notice and tell people about it.',
     'Complete the risk assessment (section 6) and have it signed off by your trustees or leadership.',
     sec.encrypted ? 'Encryption is on - keep the passphrase somewhere safe (section 7).' : 'Turn on encryption in Settings > Data & privacy, and keep the passphrase safe (section 7).',
@@ -226,12 +229,17 @@ async function buildDataProtectionPack(state, draft) {
   para('Most organisations that process personal information must pay an annual fee to the ICO, but there are exemptions. Organisations that are not run for profit can be exempt if they only process information for limited purposes such as running their membership and supporters, subject to conditions. Use the ICO\'s fee self-assessment (see references) to check, and keep a note of the answer.');
 
   // ------------------------------------------------------------------ 3 lawful basis
-  h1('3. Your lawful basis');
+  h1('3. Your lawful basis, and opting in');
   para('You need a lawful basis (UK GDPR Article 6) for holding the list at all, and an extra condition (Article 9) for any special category information. Choose them before you start, write them down, and say what they are in your privacy notice.');
+  box('We recommend an opt-in', [
+    'Caring for people is part of a church\'s purpose, so there is a reasonable argument that you could include everyone on your church list without asking, relying on legitimate interests. However, the plan involves printing people\'s names, addresses and phone numbers and handing them to another member of the church. Best practice is to ask first and include only those who say yes.',
+    'An opt-in means people make an informed choice, nobody is surprised to be contacted, and you have a clear record of who agreed and when. It also gives you a simple way to honour a change of mind: remove the opt-in tag and the person is taken off at the next update.',
+    cs.configured ? `In ChurchSuite, create a tag called "Emergency Hub", add it only to people who have opted in, and tick only that tag in Settings > Data & privacy. Tags ticked now: ${(cs.tags || []).join(', ') || 'none'}.` : 'Keep a tag, group or column in your church database for people who have opted in (for example "Emergency Hub"), and export only those people when you upload a CSV.',
+  ]);
   h2('For the list itself (Article 6)');
   table(['Basis', 'When it fits', 'Notes'], [
-    ['Legitimate interests (suggested)', 'Planning ahead so people can be contacted and helped in an emergency.', 'Do a short legitimate interests assessment: is the purpose legitimate, is the data necessary, and do people\'s interests override it? Record the result. People can object.'],
-    ['Consent', 'If you prefer people to opt in.', 'Must be freely given, specific and as easy to withdraw as to give. Keep a record of who agreed and when.'],
+    ['Consent, through an opt-in (suggested)', 'People choose to join the plan after being told what will be shared and with whom (section 5).', 'Must be freely given, specific, informed and as easy to withdraw as to give. Keep a record of who agreed, when and what they were told. If someone withdraws, remove them: taking off the opt-in tag does this at the next update.'],
+    ['Legitimate interests', 'If you decide to include people without asking, because caring for them is part of your purpose.', 'Do a short legitimate interests assessment: is the purpose legitimate, is the data necessary, and do people\'s interests override it? Record the result. People can object. If you also use an opt-in, it is a safeguard rather than your lawful basis, so say clearly which basis you rely on.'],
     ['Recognised legitimate interest: emergencies', 'Only while responding to an emergency as defined in the Civil Contingencies Act 2004 (e.g. serious flooding, loss of power or water, a major incident).', 'Must be necessary and proportionate. Document what you did and why. Go back to your normal basis afterwards.'],
     ['Vital interests', 'In an emergency when someone\'s life or health is at risk.', 'For urgent situations, not for routine planning.'],
   ], [24, 38, 38], { boldFirst: true });
@@ -244,7 +252,7 @@ async function buildDataProtectionPack(state, draft) {
   para('Conditions that commonly fit:');
   table(['Condition', 'What it requires'], [
     ['Not-for-profit bodies - Article 9(2)(d)', 'For a not-for-profit body with a religious, philosophical, political or trade union aim, in the course of its legitimate activities and with appropriate safeguards. It covers members, former members, and people in regular contact with the body for its purposes - and the information must not be shared outside the body without the person\'s consent.'],
-    ['Explicit consent - Article 9(2)(a)', 'A clear, recorded "yes" from the person, for example to being flagged as needing a check-in. They can withdraw it at any time.'],
+    ['Explicit consent - Article 9(2)(a)', 'A clear, recorded "yes" from the person. A clearly worded opt-in (section 5) can cover being on a church\'s list; ask separately before flagging someone as needing extra help. They can withdraw it at any time.'],
     ['Vital interests - Article 9(2)(c)', 'Only when needed to protect someone\'s life and the person is physically or legally unable to consent - for example sharing details with paramedics.'],
   ], [32, 68], { boldFirst: true });
   para('Good practice: ask people (or, with their agreement, a family member or carer) whether they would like to be flagged for extra help, and record that they agreed.', { colour: '#344054' });
@@ -268,20 +276,33 @@ async function buildDataProtectionPack(state, draft) {
   bullets([
     'Postcodes (and, if a postcode is not recognised, the street address) are sent to free lookup services (postcodes.io, and OpenStreetMap Nominatim as a fallback) to place people on the map. Names, phone numbers, statuses and notes are never sent.',
     'Map pictures are loaded from OpenStreetMap (or the satellite provider). They contain no personal information.',
-    cs.configured ? 'ChurchSuite: the app reads (never changes) contacts with your chosen tags, using a dedicated read-only account.' : 'Contact lists are uploaded as CSV files exported from your database.',
+    cs.configured ? 'ChurchSuite: the app reads (never changes) contacts with your chosen tags (ideally just your opt-in tag), using a dedicated read-only account.' : 'Contact lists are uploaded as CSV files exported from your database (ideally only people who have opted in).',
     'Nothing is sent to the authors of Emergency Hub Coordinator. There is no online account.',
   ]);
 
   // ------------------------------------------------------------------ 5 privacy notice
-  h1('5. Privacy notice paragraph');
+  ensure(120); // keep the heading, the intro and the opt-in form together
+  h1('5. Opt-in wording and privacy notice');
+  h2('Inviting people to opt in');
+  para('Use or adapt this wording on a paper or online form, in your newsletter or in an email. Keep the replies, and record each "yes" in your church database with the date.');
+  box('Emergency contact plan - would you like to be included?', [
+    `${org} is putting together an emergency contact plan so that, if there is a serious emergency in our area (such as flooding, a long power cut or severe weather), someone from the church who lives near you can check that you are safe and pass on any need for help.`,
+    'If you join, the church will hold your name, address, phone numbers and email address securely for this purpose. Your name, address and phone numbers will be printed on a call list and given to a hub coordinator: a church member who lives nearby and has agreed to keep them confidential. In a real emergency we may share the minimum necessary with the emergency services or the council to protect someone\'s life or safety.',
+    `Joining is your choice, and you can leave at any time by telling ${lead} (${leadContact}). You will then be removed from the plan and from the call lists when they are next updated.`,
+    '[  ]  Yes, please include me in the emergency contact plan. I agree to my details being used and shared as described above.',
+    '[  ]  I may need extra help in an emergency (for example with mobility, or because I live alone) and I am happy for my hub coordinator to know this.',
+    'Name ..................................................    Date ......................',
+  ]);
+  newPage();  // the opt-in form gets a page of its own, ready to copy
+  h2('Privacy notice paragraph');
   para(`Add this to ${org}'s privacy notice (on your website, in your welcome pack and wherever you collect contact details). Adjust the wording in [square brackets] to match the decisions you made in section 3.`);
   const contactBits = [centre.landline && `phone ${centre.landline}`, centre.email && `email ${centre.email}`].filter(Boolean).join(' or ');
   box('Emergency contact planning', [
-    `${org} keeps an emergency contact plan so that, if there is a serious emergency in our area (such as flooding, a long power cut or severe weather), we can check that our members and regular attenders are safe and get help to those who need it.`,
+    `${org} keeps an emergency contact plan so that, if there is a serious emergency in our area (such as flooding, a long power cut or severe weather), we can check that the people who have chosen to join it are safe and get help to those who need it.`,
     'For this we use your name, address, phone numbers and email address from our church records, together with information about any role you have in the plan (for example as a hub coordinator) and whether you have told us you may need extra help. Your address is used to place you on a map so that you can be contacted by someone who lives nearby.',
-    `We do this because it is in our legitimate interests, and yours, to plan for emergencies. Where we record that someone may need extra help, we do so [with their agreement / as a not-for-profit religious organisation, for our members and regular contacts]. In a real emergency we may share the minimum necessary information with the emergency services or the local council to protect someone's life or safety.`,
-    'Each hub coordinator only sees the details of the people in their own group, and has agreed to keep them confidential. The plan is kept securely on a computer held by the church and is not shared with anyone else. When you leave our church records, you are removed from the plan.',
-    `You can ask to see the information we hold about you, ask us to correct it, or ask not to be included. Please contact ${lead} (${leadContact})${contactBits ? `, or ${centre.name || 'the church office'} (${contactBits})` : ''}. If you are unhappy with how we have handled your information, please tell us first; you also have the right to complain to the Information Commissioner's Office (ico.org.uk, 0303 123 1113).`,
+    `We only include people who have asked to be included, and we rely on [your consent / our legitimate interests in planning for emergencies, with your agreement as a safeguard]. Where we record that someone may need extra help, we do so [with their agreement / as a not-for-profit religious organisation, for our members and regular contacts]. In a real emergency we may share the minimum necessary information with the emergency services or the local council to protect someone's life or safety.`,
+    'Each hub coordinator only sees the details of the people in their own group, and has agreed to keep them confidential. The plan is kept securely on a computer held by the church and is not shared with anyone else. If you leave the plan or our church records, you are removed from it at the next update.',
+    `You can leave the plan at any time, ask to see the information we hold about you, or ask us to correct it. Please contact ${lead} (${leadContact})${contactBits ? `, or ${centre.name || 'the church office'} (${contactBits})` : ''}. If you are unhappy with how we have handled your information, please tell us first; you also have the right to complain to the Information Commissioner's Office (ico.org.uk, 0303 123 1113).`,
   ]);
 
   // ------------------------------------------------------------------ 6 DPIA
@@ -293,7 +314,8 @@ async function buildDataProtectionPack(state, draft) {
     ['Hub coordinator misuses details', 'Unwanted contact, loss of trust', 'Each coordinator sees only their group; confidentiality agreement (section 12)', ''],
     ['Out-of-date or wrong information', 'Someone missed in an emergency', 'Regular update from the church database; changes report after every update', ''],
     ['Too much sensitive detail recorded', 'Unnecessary intrusion', 'Statuses are simple flags; guidance to record needs not diagnoses', ''],
-    ['Person does not want to be included', 'Loss of trust; objection', 'Privacy notice; person can be untagged or removed', ''],
+    ['Person does not want to be included', 'Loss of trust; objection', 'Opt-in: only people who have agreed are included; removing the opt-in tag takes them off at the next update', ''],
+    ['Person did not understand what they agreed to', 'Unexpected contact; loss of trust', 'Opt-in wording says what is shared and with whom; privacy notice; a record of when each person agreed', ''],
     ['Information sent to outside services', 'Addresses seen by third parties', 'Only postcodes/addresses are sent for map positions; no names', ''],
     ['Someone else uses the computer', 'Unauthorised access', sec.encrypted ? 'Passphrase and lock button' : 'Use a separate Windows account; turn on encryption', ''],
   ], [20, 22, 34, 24], { size: 8.2, minRow: 11 });
@@ -335,6 +357,7 @@ async function buildDataProtectionPack(state, draft) {
   bullets([
     `Update the list from your church database regularly${cs.configured ? ' (Sync from ChurchSuite)' : ' (upload a fresh CSV)'}. Each update treats your database as the complete list, so people who have left are removed automatically, and a changes report shows what happened.`,
     'Review statuses and notes at least once a year - for example whether someone still needs extra help - and remove anything no longer needed.',
+    'Invite new members to opt in as part of welcoming them, and remove the opt-in tag straight away when someone withdraws.',
     'The app keeps the last 30 automatic backups in the data folder. Delete older copies made elsewhere.',
     'Collect and shred printed call lists after an exercise or emergency, and whenever a new version is issued.',
     'If you stop using the system, delete the data folder (and any backups and exports).',
@@ -345,7 +368,7 @@ async function buildDataProtectionPack(state, draft) {
   para('People have the right to: be told how their information is used (the privacy notice); see a copy of it; have it corrected; have it deleted in some circumstances; object to its use; and restrict its use while a concern is looked at. Respond to requests within one month.');
   bullets([
     'To find someone\'s information quickly, use Table view (search by name) or open their contact card. Export CSV gives a copy of everything held.',
-    'If someone asks not to be included, remove the tag in your church database (or remove them from the upload) and note their request.',
+    'If someone withdraws or asks not to be included, remove the opt-in tag in your church database (or remove them from the upload) and note their request. They are removed at the next update.',
   ]);
   h2('Complaints - required from 19 June 2026');
   para('The Data (Use and Access) Act 2025 requires controllers to make it easy to complain about how personal information is handled. In practice:');
@@ -390,6 +413,7 @@ async function buildDataProtectionPack(state, draft) {
   checklist([
     'The lawful basis and special category condition are still right, and written down.',
     'The privacy notice is up to date and easy to find.',
+    'Everyone on the list has opted in, records of when they agreed are kept, and newcomers have been invited.',
     'Statuses and notes are still needed and accurate; anything unnecessary has been removed.',
     'Hub coordinators are still willing, have signed the agreement, and have current lists; old lists have been shredded.',
     'Encryption is on, the passphrase is safely stored, and the right people know how to unlock the app.',

@@ -1233,7 +1233,7 @@ def cs_config():
     cfg = _read_json(CS_PATH, {})
     cfg.setdefault("client_id", "")
     cfg.setdefault("client_secret", "")
-    cfg.setdefault("tags", ["Attender", "Partner"])   # names (kept for display, and to find IDs the first time)
+    cfg.setdefault("tags", ["Emergency Hub"])        # names (kept for display, and to find IDs the first time); the suggested opt-in tag
     cfg.setdefault("tag_ids", [])                     # the chosen tags, by ChurchSuite ID (survives renames)
     cfg.setdefault("catalog", [])                     # every tag in the ChurchSuite address book
     cfg.setdefault("catalog_updated", None)
@@ -1453,7 +1453,7 @@ def cs_sync(confirm=False):
         raise CSError("These tags no longer exist in ChurchSuite: %s. Choose the tags again in Settings - nothing has been changed."
                       % ", ".join(gone))
     if not chosen:
-        raise CSError("Choose at least one ChurchSuite tag in Settings (for example Attender and Partner)")
+        raise CSError("Choose a ChurchSuite tag in Settings (we suggest an opt-in tag called Emergency Hub)")
     contacts = cs_all("/addressbook/contacts", {"tag_ids[]": [t["id"] for t in chosen], "status": "active"})
     seen, rows = set(), []
     for c in contacts:

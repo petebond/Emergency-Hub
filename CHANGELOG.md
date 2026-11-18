@@ -2,6 +2,14 @@
 
 Each version's notes appear in the app under **Settings → About & updates** when it's available.
 
+## [1.3.0] - 2026-11-18
+
+- **Opt-in is now the recommended way to build your list.** We suggest creating a tag in ChurchSuite called **Emergency Hub**, adding it only to people who have agreed to be part of the plan, and ticking just that tag. On a new ChurchSuite connection it's ticked automatically.
+- **Settings → Data & privacy** explains the opt-in tag, marks it in the tag list, and warns you if it's missing, not ticked, or ticked alongside broader tags such as Attender or Partner.
+- The **Data Protection Pack** now recommends an opt-in, with consent as the suggested lawful basis, and includes ready-to-use wording for inviting people to join the plan. The privacy notice, risk assessment and checklists have been updated to match.
+- The quick start guide and FAQ cover opting in, including a new question: "Do people need to agree to be on the list?"
+- Switching an existing list to the opt-in tag removes everyone who hasn't opted in, along with their statuses and notes. The app asks you to confirm first and takes a backup.
+
 ## [1.2.1] - 2026-11-14
 
 - **Find a person** is now at the top of the left-hand panel.

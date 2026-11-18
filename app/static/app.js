@@ -1460,6 +1460,10 @@ function showSettings(draft) {
       <h3>ChurchSuite${demoChip}</h3>
       <p class="muted">Fetch the contact list straight from ChurchSuite instead of uploading a CSV. Only people with the tags below are fetched,
         and the link is read-only: nothing is ever changed in ChurchSuite. CSV upload keeps working as well.</p>
+      <div class="alert info cs-optin"><b>Recommended: an opt-in tag.</b> In ChurchSuite, create a tag called <b>Emergency Hub</b> and add it only to people
+        who have agreed to be part of the emergency plan, then tick just that tag below. Everyone on the list has then made an informed choice to have
+        their contact details given to a hub coordinator, and removing the tag takes them off at the next sync. Keep a note in ChurchSuite of when
+        each person agreed. The Data Protection Pack has wording you can use to ask people.</div>
       <div class="form-grid">
         <label>Client ID<input type="text" id="csClientId" value="${esc((STATE.churchsuite || {}).client_id || '')}" autocomplete="off" spellcheck="false"></label>
         <label>Client Secret<input type="password" id="csSecret" autocomplete="new-password"
@@ -1478,7 +1482,9 @@ function showSettings(draft) {
     ${demoOff('CSV upload')}
       <h3>CSV upload${demoChip}</h3>
       <p class="muted">Without a connection, use <b>Upload contacts CSV</b> in the menu. The file must be a complete export with the columns
-        First Name, Last Name, Address 1, Address 2, Town/City, County, Postcode, Country, Telephone, Mobile, Email.</p>
+        First Name, Last Name, Address 1, Address 2, Town/City, County, Postcode, Country, Telephone, Mobile, Email.
+        As with ChurchSuite, we recommend including only people who have opted in: keep a tag, group or column for them in your church
+        database and export just those people.</p>
     </section>
     ${demoOff('Encryption')}
       <h3>Encryption${demoChip} ${(STATE.security || {}).encrypted ? '<span class="chip" style="background:var(--ok)">On</span>' : '<span class="chip grey">Off</span>'}</h3>
@@ -1836,15 +1842,27 @@ function renderTagPicker() {
   const groups = {};
   cat.forEach((t) => { (groups[t.category || 'Other tags'] = groups[t.category || 'Other tags'] || []).push(t); });
   const sw = (t) => (/^#[0-9a-f]{3,8}$/i.test(t.colour || '') ? `<span class="swatch" style="background:${esc(t.colour)}"></span>` : '');
+  const optin = (t) => /^emergency\s*hub$/i.test((t.name || '').trim());
+  const optinTag = cat.find(optin);
+  const others = cat.filter((t) => chosen.has(t.id) && !optin(t));
+  let advice = '';
+  if (!optinTag) {
+    advice = '<div class="alert warn">There is no <b>Emergency Hub</b> tag in ChurchSuite yet. We recommend creating one and adding it only to people who have opted in, then ticking it here instead of broad tags such as Attender or Partner.</div>';
+  } else if (!chosen.has(optinTag.id)) {
+    advice = `<div class="alert warn">Your ChurchSuite has an opt-in tag, <b>${esc(optinTag.name)}</b>, but it isn't ticked. Tick it, and untick the other tags, so that only people who have opted in are included.</div>`;
+  } else if (others.length) {
+    advice = `<div class="alert warn">As well as the opt-in tag, these tags are ticked: <b>${others.map((t) => esc(t.name)).join(', ')}</b>. Anyone with them is included even if they haven't opted in. Untick them unless that's what you intend.</div>`;
+  }
   box.innerHTML = `<div class="cs-picker-head">
-      <div><b>Tags to include</b> <span class="muted">- anyone with any ticked tag is included</span>
+      <div><b>Tags to include</b> <span class="muted">- anyone with any ticked tag is included. We recommend ticking only your opt-in tag.</span>
         <div class="muted" style="font-size:12px">${chosen.size} chosen${chosen.size ? ': ' + cat.filter((t) => chosen.has(t.id)).map((t) => esc(t.name)).join(', ') : ''}.
           Tag list from ChurchSuite${cs.catalog_updated ? `, updated ${esc(fmtDate(cs.catalog_updated))}` : ''} and on every sync.</div></div>
       ${cat.length > 10 ? '<input type="search" id="csTagFilter" placeholder="Filter tags" style="max-width:220px">' : ''}
     </div>
+    ${advice}
     <div class="cs-picker">${Object.keys(groups).map((g) => `<div class="cs-cat"><div class="cs-cat-name">${esc(g)}</div>
       ${groups[g].map((t) => `<label class="cs-tag" data-name="${esc(t.name.toLowerCase())}"><input type="checkbox" data-tag-id="${t.id}" ${chosen.has(t.id) ? 'checked' : ''}>
-        ${sw(t)}<span>${esc(t.name)}</span>${t.is_smart ? '<small class="muted">smart</small>' : ''}</label>`).join('')}</div>`).join('')}</div>`;
+        ${sw(t)}<span>${esc(t.name)}</span>${t.is_smart ? '<small class="muted">smart</small>' : ''}${optin(t) ? '<small class="chip" style="background:var(--ok)">opt-in</small>' : ''}</label>`).join('')}</div>`).join('')}</div>`;
   let timer = null;
   box.querySelectorAll('[data-tag-id]').forEach((cb) => cb.addEventListener('change', () => {
     clearTimeout(timer);
